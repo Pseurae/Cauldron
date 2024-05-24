@@ -6,7 +6,7 @@
 
 namespace Tonic::Graphics::OpenGL
 {
-class OGLDevice : public Device
+class OGLDevice final : public Device
 {
 public:
     OGLDevice(const Core::Window &window);

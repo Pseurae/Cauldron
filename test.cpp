@@ -1,4 +1,6 @@
 #include <Tonic/Core/Window.h>
+#include <Tonic/Input/Keyboard.h>
+#include <Tonic/Input/Mouse.h>
 #include <Tonic/Graphics/Buffer.h>
 #include <Tonic/Graphics/Shader.h>
 #include <Tonic/Graphics/Draw.h>
@@ -73,8 +75,19 @@ int main(int argc, char* const argv[])
 {
     bool isRunning = true;
 
+    Tonic::Input::Keyboard keyboard;
+    Tonic::Input::Mouse mouse;
+
     Tonic::Core::Window window;
+
     window.SetCloseCallback([&]() { isRunning = false; });
+    window.SetKeyCallback([&](Tonic::Input::Key key, Tonic::Input::Action action, Tonic::Input::KeyMod mods) {
+        keyboard.Update(key, action, mods);
+    });
+    window.SetMouseButtonCallback([&](Tonic::Input::MouseButton button, Tonic::Input::Action action, Tonic::Input::KeyMod mods) {
+        mouse.Update(button, action, mods);
+    });
+
     window.Create({ "Test", 800, 600 });
 
     Tonic::Unique<Tonic::Graphics::Device> device = Tonic::CreateUnique<Tonic::Graphics::OpenGL::OGLDevice>(window);
@@ -111,7 +124,13 @@ int main(int argc, char* const argv[])
 
     while (isRunning)
     {
+        keyboard.SwapState();
+        mouse.SwapState();
+
         window.PumpEvents();
+
+        if (keyboard.Released(Tonic::Input::Key::A)) std::cout << "Pressed A." << std::endl;
+        if (mouse.Pressed(Tonic::Input::MouseButton::Left)) std::cout << "Pressed LMB" << std::endl;
     }
 
     return 0;

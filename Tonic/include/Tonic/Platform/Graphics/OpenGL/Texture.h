@@ -9,6 +9,8 @@ class OGLTexture : public Texture
 {
 public:
     OGLTexture(Device &device, const TextureDesc &desc);
+    ~OGLTexture();
+
     auto GetID() const { return m_TextureID; }
 private:
     unsigned int m_TextureID;

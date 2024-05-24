@@ -2,6 +2,7 @@
 
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
+#include <stdexcept>
 
 namespace Tonic::Core
 {
@@ -21,7 +22,7 @@ static Input::MouseButton convertFromGLFWMouseButton(int button)
     case GLFW_MOUSE_BUTTON_RIGHT:
         return Input::MouseButton::Right;
     default:
-        throw "Test";
+        throw std::runtime_error("Invalid mousebutton received.");
     }
 }
 
@@ -74,8 +75,11 @@ bool Window::Create(const WindowDescriptor &desc, bool createGLContext)
             win->m_MouseButtonCallback(convertFromGLFWMouseButton(button), convertFromGLFWAction(action), convertFromGLFWKeyMod(mods));
     });
 
-    if (createGLContext) glfwMakeContextCurrent(m_Window);
-    glfwSwapInterval(1);
+    if (createGLContext)
+    {
+        glfwMakeContextCurrent(m_Window);   
+        glfwSwapInterval(1);
+    }
 
     return true;
 }
@@ -87,7 +91,7 @@ void Window::ShouldClose(bool shouldClose)
 
 void Window::PumpEvents()
 {
-    glfwWaitEvents();
+    glfwPollEvents();
 }
 
 void Window::SwapBuffers() const

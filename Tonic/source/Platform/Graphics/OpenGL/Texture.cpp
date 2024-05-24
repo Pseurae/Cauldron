@@ -54,4 +54,9 @@ OGLTexture::OGLTexture(Device &device, const TextureDesc &desc) : Texture(device
 
     glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+OGLTexture::~OGLTexture()
+{
+    glDeleteTextures(1, &m_TextureID);
+}
 }

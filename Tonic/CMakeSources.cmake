@@ -7,6 +7,9 @@ set(TONIC_SOURCES
     "Graphics/Blend.cpp"
     "Graphics/Device.cpp"
 
+    "Input/Keyboard.cpp"
+    "Input/Mouse.cpp"
+
     "Platform/Graphics/OpenGL/Buffer.cpp"
     "Platform/Graphics/OpenGL/Device.cpp"
     "Platform/Graphics/OpenGL/Shader.cpp"
@@ -31,6 +34,7 @@ set(TONIC_HEADERS
     "Tonic/Graphics/Texture.h"
 
     "Tonic/Input/Keyboard.h"
+    "Tonic/Input/Keys.h"
     "Tonic/Input/Mouse.h"
 
     "Tonic/Platform/Graphics/OpenGL/Buffer.h"

@@ -12,12 +12,14 @@
 #include <GL/gl3w.h>
 
 #include <numeric>
+#include <stdexcept>
 
 namespace Tonic::Graphics::OpenGL
 {
 OGLDevice::OGLDevice(const Core::Window &window) : Device(window), m_Window(window)
 {
-    gl3wInit();
+    if (gl3wInit()) throw std::runtime_error("Could not bind OpenGL functions!");
+
     glGenVertexArrays(1, &m_VertexArray);
     glBindVertexArray(m_VertexArray);
 

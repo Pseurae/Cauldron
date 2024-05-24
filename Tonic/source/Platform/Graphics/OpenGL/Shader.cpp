@@ -26,4 +26,10 @@ OGLShader::OGLShader(Device &device, const ShaderDesc &desc) : Shader(device)
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 }
+
+OGLShader::~OGLShader()
+{
+    glDeleteProgram(m_ProgramID);
+    m_ProgramID = 0;
+}
 }

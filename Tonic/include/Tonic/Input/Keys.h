@@ -137,6 +137,8 @@ enum class Key
     RSuper = 347,
 };
 
+constexpr auto KeyCount = 348;
+
 struct KeyMod
 {
     bool Shift;
@@ -152,6 +154,8 @@ enum class MouseButton
     Right,
     Middle,
 };
+
+constexpr auto MouseButtonCount = 3;
 }
 
 #endif // TONIC_INPUT_KEYS_H

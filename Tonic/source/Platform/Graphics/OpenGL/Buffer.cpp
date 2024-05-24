@@ -16,7 +16,7 @@ static unsigned int GLTarget(BufferRole role)
     case BufferRole::Uniform:
         return GL_UNIFORM_BUFFER;
     default:
-        throw "Error";
+        throw std::runtime_error("Invalid BufferRole.");
     }
 }
 
