@@ -9,7 +9,8 @@ namespace Tonic::Graphics
 enum class BufferRole
 {
     Index,
-    Vertex
+    Vertex,
+    Uniform
 };
 
 class Buffer : public Resource 
@@ -20,7 +21,7 @@ public:
     virtual void SetData(std::span<const unsigned char> data) = 0;
     virtual void SetSubData(std::span<const unsigned char> data, unsigned int offset) = 0;
 
-    BufferRole GetRole() const { return m_BufferRole; }
+    inline BufferRole GetRole() const { return m_BufferRole; }
 private:
     BufferRole m_BufferRole;
 };

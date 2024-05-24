@@ -3,6 +3,7 @@
 
 #include <string>
 #include <functional>
+#include "Tonic/Input/Keys.h"
 
 struct GLFWwindow;
 
@@ -17,8 +18,8 @@ struct WindowDescriptor
 class Window final
 {
 private:
-    using KeyCallback = std::function<void(int key, int action, int mods)>;
-    using MouseButtonCallback = std::function<void(int button, int action, int mods)>;
+    using KeyCallback = std::function<void(Input::Key key, Input::Action action, Input::KeyMod mods)>;
+    using MouseButtonCallback = std::function<void(Input::MouseButton button, Input::Action action, Input::KeyMod mods)>;
     using CloseCallback = std::function<void()>;
 
 public:
@@ -29,7 +30,7 @@ public:
     void ShouldClose(bool shouldClose);
 
     void PumpEvents();
-    void SwapBuffer();
+    void SwapBuffers() const;
     
     void SetKeyCallback(KeyCallback callback) { m_KeyCallback = callback; }
     void SetMouseButtonCallback(MouseButtonCallback callback) { m_MouseButtonCallback = callback; }

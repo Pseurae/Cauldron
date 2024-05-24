@@ -3,7 +3,7 @@
 
 namespace Tonic::Graphics::OpenGL
 {
-OGLShader::OGLShader(Device &device, const ShaderDesc &desc) : Shader(device, desc.vertexLayout)
+OGLShader::OGLShader(Device &device, const ShaderDesc &desc) : Shader(device)
 {
     unsigned int vertex = 0, fragment = 0;
     const char *source = NULL;

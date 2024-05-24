@@ -39,13 +39,19 @@ OGLTexture::OGLTexture(Device &device, const TextureDesc &desc) : Texture(device
     glBindTexture(GL_TEXTURE_2D, m_TextureID);
 
     unsigned int format = desc.numChannels == 3 ? GL_RGB : GL_RGBA; 
-    glTexImage2D(GL_TEXTURE_2D, 0, format, desc.width, desc.height, 0, format, GL_UNSIGNED_BYTE, desc.data);
-    glGenerateMipmap(GL_TEXTURE_2D);
+
+    if (desc.data != nullptr && desc.numChannels != 0)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, format, desc.width, desc.height, 0, format, GL_UNSIGNED_BYTE, desc.data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, getWrapMode(desc.wrapMode));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, getWrapMode(desc.wrapMode));
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getFilterType(desc.filterType));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getFilterType(desc.filterType));
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 }

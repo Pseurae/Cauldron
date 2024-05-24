@@ -1,9 +1,13 @@
 #include <Tonic/Core/Window.h>
 #include <Tonic/Graphics/Buffer.h>
 #include <Tonic/Graphics/Shader.h>
-#include <Tonic/Graphics/PipelineState.h>
 #include <Tonic/Graphics/Draw.h>
+#include <Tonic/Graphics/Blend.h>
+#include <Tonic/Graphics/Pipeline.h>
+#include <Tonic/Graphics/Texture.h>
 #include <Tonic/Platform/Graphics/OpenGL/Device.h>
+
+#include <Tonic/Common/Pointers.h>
 
 #include <Tonic/FileSystem/VFS/Drive.h>
 #include <Tonic/FileSystem/VFS/NativeProvider.h>
@@ -11,10 +15,13 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/vec4.hpp>
+
 static const float VertexBufferData[] = {
-    -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
-     0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-     0.0f,  0.5f, 1.0f, 0.0f, 0.0f
+    -0.5f, -0.5f, 0.0, 0.0,
+    -0.5f,  0.5f, 0.0, 1.0,
+     0.5f, -0.5f, 1.0, 0.0,
+     0.5f,  0.5f, 1.0, 1.0,
 };
 
 using namespace Tonic::Graphics;
@@ -22,31 +29,43 @@ using namespace Tonic::Graphics;
 static const std::string vertexShaderSource = R"(
 #version 330 core
 layout (location = 0) in vec2 aPos;
-layout (location = 1) in vec3 aColor;
+layout (location = 1) in vec2 aUv;
 
-out vec3 color;
+out vec2 vUV;
 
 void main()
 {
     gl_Position = vec4(aPos.x, aPos.y, 0.0f, 1.0f);
-    color = aColor;
+    vUV = aUv;
 }
 )";
 
 static const std::string fragmentShaderSource = R"(
 #version 330 core
 out vec4 FragColor;
-in vec3 color;
+in vec2 vUV;
+
+layout (std140) uniform Uniforms {
+    vec4 uColor;
+};
+
+uniform sampler2D tex0;
 
 void main()
 {
-    FragColor = vec4(1.0, 0.0, 0.0, 0.7f);
+    FragColor = texture2D(tex0, vUV) * uColor;
 } 
 )";
 
 static const unsigned int indices[] = {
     0, 1, 2,
-};  
+    2, 1, 3
+};
+
+struct Uniforms
+{
+    glm::vec4 color;
+};
 
 #include <iostream>
 
@@ -54,56 +73,46 @@ int main(int argc, char* const argv[])
 {
     bool isRunning = true;
 
-    Tonic::FileSystem::VFS::Drive drive;
-    drive.Mount("test", Tonic::CreateShared<Tonic::FileSystem::VFS::NativeProvider>("."));
-    std::cout << drive.Exists("test/test.txt") << std::endl;
-
-    if (auto file = drive.OpenRead("test/test.txt"))
-    {
-        char buffer[100];
-        buffer[file->Read(buffer, 1, 100)] = '\0';
-
-        std::cout << buffer << std::endl;
-    }
-
-    if (auto file = drive.OpenWrite("test/test1.txt"))
-    {
-        const char test[] = "TestFile1";
-        file->Write(test, 1, sizeof(test) - 1);
-    }
-
     Tonic::Core::Window window;
     window.SetCloseCallback([&]() { isRunning = false; });
     window.Create({ "Test", 800, 600 });
 
-    Tonic::Graphics::OpenGL::OGLDevice device(window);
+    Tonic::Unique<Tonic::Graphics::Device> device = Tonic::CreateUnique<Tonic::Graphics::OpenGL::OGLDevice>(window);
 
-    auto vbo = device.CreateBufferGeneric(std::span<const float>(VertexBufferData), BufferRole::Vertex);
-    auto ibo = device.CreateBufferGeneric(std::span<const unsigned int>(indices), BufferRole::Index);
+    const unsigned char textureData[] = { 
+        255, 255, 255, 255, 
+          0,   0,   0, 255, 
+          0,   0,   0, 255,
+        255, 255, 255, 255, 
+    };
+    auto textureDesc = TextureDesc{ textureData, 2, 2, 4, TextureWrapMode::ClampBorder, TextureFilterType::Nearest };
 
-    auto shader = device.CreateShader(ShaderDesc{ vertexShaderSource, fragmentShaderSource, {
+    const Uniforms uboData = { glm::vec4(1.0f, 0.0f, 0.0f, 1.0f) };
+
+    auto vbo = device->CreateBuffer(VertexBufferData, BufferRole::Vertex);
+    auto ibo = device->CreateBuffer(indices, BufferRole::Index);
+    auto ubo = device->CreateBuffer(uboData, BufferRole::Uniform);
+
+    auto texture = device->CreateTexture(textureDesc);
+    auto shader = device->CreateShader({ vertexShaderSource, fragmentShaderSource, });
+
+    Layout vertexLayout = {
         { DataType::Float, 2, 0 },
-        { DataType::Float, 3, 0 },
-    }});
-
-    auto transparencyBlend = BlendState{ true, 
-        BlendFactor::SourceAlpha,  BlendFactor::OneMinusSourceAlpha,
-        BlendFactor::SourceAlpha, BlendFactor::OneMinusSourceAlpha,
-        BlendFunction::Add, BlendFunction::Add
+        { DataType::Float, 2, 0 },
     };
 
-    device.SetClearColor({ 1.0, 1.0, 1.0, 1.0 });
-    device.SetPipelineState(PipelineState{ shader, transparencyBlend });
+    device->SetTextures({ texture });
+    device->SetPipeline({ shader, vertexLayout, ubo });
+    device->SetClearColor({ 1.0, 1.0, 1.0, 1.0 });
+    device->Clear();
+
+    device->DrawIndexed({ DrawMode::Triangles, vbo, ibo, sizeof(indices) / sizeof(*indices), 0, IndexElementType::Int });
+    device->Present();
 
     while (isRunning)
     {
-        device.Clear();
-
-        device.DrawIndexed({ DrawMode::Triangles, vbo, ibo, 3, 0, IndexElementType::Int });
-        window.SwapBuffer();
-        device.Present();
-
         window.PumpEvents();
     }
+
     return 0;
 }

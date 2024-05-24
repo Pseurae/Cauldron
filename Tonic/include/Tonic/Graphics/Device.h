@@ -3,6 +3,7 @@
 
 #include "Tonic/Common/Pointers.h"
 
+#include <vector>
 #include <span>
 #include <string>
 #include <glm/vec4.hpp>
@@ -23,38 +24,56 @@ class Texture;
 struct ShaderDesc;
 class Shader;
 
-class PipelineState;
+struct Pipeline;
 
 struct DrawIndexedDesc;
 
 class Device 
 {
 public:
+    struct Capabilities
+    {
+        int MaxTextureUnits;
+        bool NPOTTexturesSupported:1;
+    };
+
     explicit Device(const Core::Window &window);
+    virtual ~Device() = default;
 
     /* Vertices */
 
-    template<typename T>
-    Shared<Buffer> CreateBufferGeneric(std::span<const T> data, BufferRole role)
+    template<typename T, std::size_t N>
+    [[nodiscard]] inline Shared<Buffer> CreateBuffer(std::span<const T, N> data, BufferRole role)
     {
         return CreateBuffer(std::span<const unsigned char>{ (const unsigned char *)data.data(), data.size_bytes() }, role);
     }
 
-    virtual Shared<Buffer> CreateBuffer(std::span<const unsigned char> data, BufferRole role) = 0; // Static
-    virtual Shared<Buffer> CreateBuffer(unsigned int size, BufferRole role) = 0; // Dynamic
+    template<typename T, std::size_t N>
+    [[nodiscard]] inline Shared<Buffer> CreateBuffer(const T (&arr)[N], BufferRole role)
+    {
+        return CreateBuffer(std::span<const unsigned char>{ (const unsigned char *)arr, N * sizeof(T) }, role);
+    }
+
+    template<typename T>
+    [[nodiscard]] inline Shared<Buffer> CreateBuffer(const T &arr, BufferRole role)
+    {
+        return CreateBuffer(std::span<const unsigned char>{ (const unsigned char *)&arr, sizeof(T) }, role);
+    }
+
+    [[nodiscard]] virtual Shared<Buffer> CreateBuffer(std::span<const unsigned char> data, BufferRole role) = 0; // Static
+    [[nodiscard]] virtual Shared<Buffer> CreateBuffer(unsigned int size, BufferRole role) = 0; // Dynamic
 
     /* Shaders */
-    virtual Shared<Shader> CreateShader(const ShaderDesc &desc) = 0;
-
-    /* Uniforms */
+    [[nodiscard]] virtual Shared<Shader> CreateShader(const ShaderDesc &desc) = 0;
 
     /* Texture */
-    virtual Shared<Texture> CreateTexture(const TextureDesc &desc) = 0;
+    [[nodiscard]] virtual Shared<Texture> CreateTexture(const TextureDesc &desc) = 0;
+    virtual void SetTextures(const std::vector<Shared<Texture>> &textures) = 0;
 
     /* FrameBuffer */
 
     /* Render */
-    virtual void SetPipelineState(const PipelineState &state) = 0;
+    virtual void SetPipeline(const Pipeline &pipeline) = 0;
     virtual void DrawIndexed(const DrawIndexedDesc &desc) = 0;
 
     virtual void SetClearColor(const glm::vec4 &color) = 0;

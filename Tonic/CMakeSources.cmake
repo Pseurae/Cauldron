@@ -1,9 +1,10 @@
 set(TONIC_SOURCES 
     "Core/Window.cpp"
-    
+        
     "FileSystem/VFS/Drive.cpp"
     "FileSystem/VFS/NativeProvider.cpp"
 
+    "Graphics/Blend.cpp"
     "Graphics/Device.cpp"
 
     "Platform/Graphics/OpenGL/Buffer.cpp"
@@ -22,9 +23,9 @@ set(TONIC_HEADERS
     "Tonic/FileSystem/VFS/Provider.h"
     "Tonic/FileSystem/VFS/NativeProvider.h"
 
+    "Tonic/Graphics/Blend.h"
     "Tonic/Graphics/Buffer.h"
     "Tonic/Graphics/Device.h"
-    "Tonic/Graphics/PipelineState.h"
     "Tonic/Graphics/Resource.h"
     "Tonic/Graphics/Shader.h"
     "Tonic/Graphics/Texture.h"

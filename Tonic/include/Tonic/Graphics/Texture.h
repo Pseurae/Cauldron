@@ -21,7 +21,7 @@ enum class TextureFilterType
 
 struct TextureDesc
 {
-    unsigned char *data;
+    const unsigned char *data;
     unsigned int width, height;
     unsigned numChannels;
 

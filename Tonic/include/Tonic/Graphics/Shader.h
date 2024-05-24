@@ -5,6 +5,7 @@
 #include "Tonic/Graphics/Layout.h"
 #include <string>
 #include <vector>
+#include <map>
 
 namespace Tonic::Graphics
 {
@@ -12,17 +13,12 @@ struct ShaderDesc
 {
     std::string vertex;
     std::string fragment;
-
-    Layout vertexLayout;
 };
 
 class Shader : public Resource 
 {
 public:
-    explicit Shader(Device &device, Layout layout) : Resource(device), m_Layout(layout) {}
-    const auto &GetLayout() const { return m_Layout; }
-private:
-    Layout m_Layout;
+    explicit Shader(Device &device) : Resource(device) {}
 };
 }
 

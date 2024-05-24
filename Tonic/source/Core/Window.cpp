@@ -5,6 +5,43 @@
 
 namespace Tonic::Core
 {
+static Input::Key convertFromGLFWKey(int key)
+{
+    return static_cast<Input::Key>(key);
+}
+
+static Input::MouseButton convertFromGLFWMouseButton(int button)
+{
+    switch (button)
+    {
+    case GLFW_MOUSE_BUTTON_LEFT:
+        return Input::MouseButton::Left;
+    case GLFW_MOUSE_BUTTON_MIDDLE:
+        return Input::MouseButton::Middle;
+    case GLFW_MOUSE_BUTTON_RIGHT:
+        return Input::MouseButton::Right;
+    default:
+        throw "Test";
+    }
+}
+
+static Input::Action convertFromGLFWAction(int action)
+{
+    if (action == GLFW_PRESS) return Input::Action::Press;
+    else return Input::Action::Release;
+}
+
+static Input::KeyMod convertFromGLFWKeyMod(int mods)
+{
+    return Input::KeyMod{
+        (mods & GLFW_MOD_SHIFT) == GLFW_MOD_SHIFT,
+        (mods & GLFW_MOD_ALT) == GLFW_MOD_ALT,
+        (mods & GLFW_MOD_CONTROL) == GLFW_MOD_CONTROL,
+        (mods & GLFW_MOD_CAPS_LOCK) == GLFW_MOD_CAPS_LOCK,
+        (mods & GLFW_MOD_NUM_LOCK) == GLFW_MOD_NUM_LOCK,
+    };
+}
+
 bool Window::Create(const WindowDescriptor &desc, bool createGLContext)
 {
     if (glfwInit() == GLFW_FALSE) return false;
@@ -23,17 +60,18 @@ bool Window::Create(const WindowDescriptor &desc, bool createGLContext)
 
     glfwSetKeyCallback(m_Window, [](GLFWwindow *window, int key, int, int action, int mods) {
         auto win = static_cast<Tonic::Core::Window *>(glfwGetWindowUserPointer(window));
-        if (win->m_KeyCallback != nullptr) win->m_KeyCallback(key, action, mods);
+        if (win->m_KeyCallback && action != GLFW_REPEAT) win->m_KeyCallback(convertFromGLFWKey(key), convertFromGLFWAction(action), convertFromGLFWKeyMod(mods));
     });
 
     glfwSetWindowCloseCallback(m_Window, [](GLFWwindow *window) {
         auto win = static_cast<Tonic::Core::Window *>(glfwGetWindowUserPointer(window));
-        if (win->m_CloseCallback != nullptr) win->m_CloseCallback();
+        if (win->m_CloseCallback) win->m_CloseCallback();
     });
 
     glfwSetMouseButtonCallback(m_Window, [](GLFWwindow *window, int button, int action, int mods) {
         auto win = static_cast<Tonic::Core::Window *>(glfwGetWindowUserPointer(window));
-        if (win->m_MouseButtonCallback != nullptr) win->m_MouseButtonCallback(button, action, mods);
+        if (win->m_MouseButtonCallback && button >= GLFW_MOUSE_BUTTON_LEFT && button <= GLFW_MOUSE_BUTTON_MIDDLE) 
+            win->m_MouseButtonCallback(convertFromGLFWMouseButton(button), convertFromGLFWAction(action), convertFromGLFWKeyMod(mods));
     });
 
     if (createGLContext) glfwMakeContextCurrent(m_Window);
@@ -49,10 +87,10 @@ void Window::ShouldClose(bool shouldClose)
 
 void Window::PumpEvents()
 {
-    glfwPollEvents();
+    glfwWaitEvents();
 }
 
-void Window::SwapBuffer()
+void Window::SwapBuffers() const
 {
     glfwSwapBuffers(m_Window);
 }

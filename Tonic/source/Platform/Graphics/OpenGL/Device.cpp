@@ -1,9 +1,13 @@
 #include "Tonic/Platform/Graphics/OpenGL/Device.h"
 #include "Tonic/Platform/Graphics/OpenGL/Buffer.h"
 #include "Tonic/Platform/Graphics/OpenGL/Shader.h"
+#include "Tonic/Platform/Graphics/OpenGL/Texture.h"
 
 #include "Tonic/Graphics/Draw.h"
-#include "Tonic/Graphics/PipelineState.h"
+#include "Tonic/Graphics/Blend.h"
+#include "Tonic/Graphics/Pipeline.h"
+
+#include "Tonic/Core/Window.h"
 
 #include <GL/gl3w.h>
 
@@ -11,12 +15,13 @@
 
 namespace Tonic::Graphics::OpenGL
 {
-OGLDevice::OGLDevice(Core::Window& window) : Device(window)
+OGLDevice::OGLDevice(const Core::Window &window) : Device(window), m_Window(window)
 {
     gl3wInit();
-
     glGenVertexArrays(1, &m_VertexArray);
     glBindVertexArray(m_VertexArray);
+
+    glEnable(GL_BLEND);
 }
 
 OGLDevice::~OGLDevice()
@@ -37,6 +42,23 @@ Shared<Buffer> OGLDevice::CreateBuffer(unsigned int size, BufferRole role)
 Shared<Shader> OGLDevice::CreateShader(const ShaderDesc &desc)
 {
     return CreateShared<OGLShader>(*this, desc);
+}
+
+Shared<Texture> OGLDevice::CreateTexture(const TextureDesc &desc)
+{
+    return CreateShared<OGLTexture>(*this, desc);
+}
+
+void OGLDevice::SetTextures(const std::vector<Shared<Texture>> &textures)
+{
+    for (auto i = 0; i < textures.size(); ++i)
+    {
+        const auto &texture = static_cast<OGLTexture *>(textures[i].get());
+        if (!texture) continue;
+
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, texture->GetID());
+    }
 }
 
 static constexpr unsigned int getGLType(DataType type)
@@ -131,40 +153,39 @@ unsigned int getGLBlendFactor(BlendFactor factor)
 }
 
 
-void OGLDevice::SetPipelineState(const PipelineState &state)
+void OGLDevice::SetPipeline(const Pipeline &pipeline)
 {
-    OGLShader *shader = static_cast<OGLShader *>(state.shader.get());
+    OGLShader *shader = static_cast<OGLShader *>(pipeline.shader.get());
+    OGLBuffer *uniformBuffer = static_cast<OGLBuffer *>(pipeline.uniforms.get());
+
     if (shader)
     {
-        glUseProgram(shader->GetID());
-        m_Layout = shader->GetLayout();
+        auto shaderId = shader->GetID();
+        glUseProgram(shaderId);
 
-        // const auto &layout = shader->GetLayout();
-        // unsigned int size = std::accumulate(layout.begin(), layout.end(), 0u, [](unsigned int last, VertexElement el) { return getGLSize(el.type) * el.count + last; });
+        if (uniformBuffer)
+        {
+            unsigned int index = glGetUniformBlockIndex(shaderId, "Uniforms");
+            glUniformBlockBinding(shaderId, index, 1);
+            glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformBuffer->GetID());
+        }
 
-        // uintptr_t stride = 0;
-        // for (unsigned int i = 0; i < layout.size(); ++i)
-        // {
-        //     const auto &el = layout[i];
-
-        //     glEnableVertexAttribArray(i);
-        //     glVertexAttribPointer(i, el.count, getGLType(el.type), el.normalized, size, (const void *)stride);
-
-        //     stride += getGLSize(el.type) * el.count;
-        // }
+        glUniform1i(glGetUniformLocation(shader->GetID(), "tex0"), 0);
     }
 
-    if (state.blendState)
-    {
-        if (state.blendState->isBlendingEnabled) glEnable(GL_BLEND);
-        glBlendEquationSeparate(getGLBlendFunction(state.blendState->rgbFunc), getGLBlendFunction(state.blendState->alphaFunc));
-        glBlendFuncSeparate(
-            getGLBlendFactor(state.blendState->sourceRGB), 
-            getGLBlendFactor(state.blendState->destinationRGB), 
-            getGLBlendFactor(state.blendState->sourceAlpha), 
-            getGLBlendFactor(state.blendState->destinationAlpha)
-        );
-    }
+    m_Layout = pipeline.vertexLayout;
+
+    glBlendEquationSeparate(
+        getGLBlendFunction(pipeline.blendState.ColorFunction), 
+        getGLBlendFunction(pipeline.blendState.AlphaFunction)
+    );
+
+    glBlendFuncSeparate(
+        getGLBlendFactor(pipeline.blendState.SourceColor), 
+        getGLBlendFactor(pipeline.blendState.DestinationColor), 
+        getGLBlendFactor(pipeline.blendState.SourceAlpha), 
+        getGLBlendFactor(pipeline.blendState.DestinationAlpha)
+    );
 }
 
 static constexpr unsigned int getGLTypeForIndexElement(IndexElementType type)
@@ -237,5 +258,6 @@ void OGLDevice::Clear()
 
 void OGLDevice::Present()
 {
+    m_Window.SwapBuffers();
 }
 }
