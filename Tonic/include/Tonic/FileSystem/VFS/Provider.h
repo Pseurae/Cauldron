@@ -3,7 +3,7 @@
 
 #include <filesystem>
 #include <span>
-#include "Tonic/Common/Pointers.h"
+#include <Ethyl/Pointers.h>
 
 namespace Tonic::FileSystem::VFS
 {
@@ -22,8 +22,8 @@ class Provider
 {
 public:
     [[nodiscard]] virtual bool Exists(const std::filesystem::path &relativePath) = 0;
-    [[nodiscard]] virtual Shared<File> OpenRead(const std::filesystem::path &relativePath) = 0;
-    [[nodiscard]] virtual Shared<File> OpenWrite(const std::filesystem::path &relativePath) = 0;
+    [[nodiscard]] virtual Ethyl::Shared<File> OpenRead(const std::filesystem::path &relativePath) = 0;
+    [[nodiscard]] virtual Ethyl::Shared<File> OpenWrite(const std::filesystem::path &relativePath) = 0;
 };
 }
 

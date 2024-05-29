@@ -14,9 +14,9 @@ public:
     void Update(Key key, Action action, KeyMod mods);
     void SwapState() { m_LastKeys = m_CurrentKeys; }
 
-    bool Held(Key key) { return m_CurrentKeys[(int)key] && m_LastKeys[(int)key]; }
-    bool Pressed(Key key) { return m_CurrentKeys[(int)key] && !m_LastKeys[(int)key]; }
-    bool Released(Key key) { return !m_CurrentKeys[(int)key] && m_LastKeys[(int)key]; }
+    bool Held(Key key) const { return m_CurrentKeys[(int)key] && m_LastKeys[(int)key]; }
+    bool Pressed(Key key) const { return m_CurrentKeys[(int)key] && !m_LastKeys[(int)key]; }
+    bool Released(Key key) const { return !m_CurrentKeys[(int)key] && m_LastKeys[(int)key]; }
 
 private:
     KeyMod m_Mods;

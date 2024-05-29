@@ -9,21 +9,22 @@ namespace Tonic::Graphics::OpenGL
 class OGLDevice final : public Device
 {
 public:
-    OGLDevice(const Core::Window &window);
+    OGLDevice(const Window &window);
     ~OGLDevice();
 
     /* Vertices */
-    Shared<Buffer> CreateBuffer(std::span<const unsigned char> data, BufferRole role) override; // Static
-    Shared<Buffer> CreateBuffer(unsigned int size, BufferRole role) override; // Dynamic
+    Ethyl::Shared<Buffer> CreateBuffer(std::span<const unsigned char> data, BufferRole role) override; // Static
+    Ethyl::Shared<Buffer> CreateBuffer(unsigned int size, BufferRole role) override; // Dynamic
 
     /* Shaders */
-    Shared<Shader> CreateShader(const ShaderDesc &desc) override;
+    Ethyl::Shared<Shader> CreateShader(const ShaderDesc &desc) override;
 
     /* Textures */
-    Shared<Texture> CreateTexture(const TextureDesc &desc) override;
-    void SetTextures(const std::vector<Shared<Texture>> &textures) override;
+    Ethyl::Shared<Texture> CreateTexture(const TextureDesc &desc) override;
+    void SetTextures(const std::vector<Ethyl::Shared<Texture>> &textures) override;
 
     /* Render */
+    void SetViewport(const glm::ivec4 &view) override;
     void SetPipeline(const Pipeline &pipeline) override;
     void DrawIndexed(const DrawIndexedDesc &desc) override;
 
@@ -35,7 +36,7 @@ private:
     unsigned int m_VertexArray;
 
     Layout m_Layout;
-    const Core::Window &m_Window;
+    const Window &m_Window;
 };
 }
 

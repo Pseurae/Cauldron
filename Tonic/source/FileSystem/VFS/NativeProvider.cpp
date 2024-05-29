@@ -24,19 +24,19 @@ bool NativeProvider::Exists(const std::filesystem::path &relativePath)
     return std::filesystem::exists(m_BasePath / relativePath);
 }
 
-Shared<File> NativeProvider::OpenRead(const std::filesystem::path &relativePath)
+Ethyl::Shared<File> NativeProvider::OpenRead(const std::filesystem::path &relativePath)
 {
     std::ifstream stream{m_BasePath / relativePath};
     if (!stream.is_open() || stream.bad()) return nullptr;
 
-    return CreateShared<NativeInputFile>(stream);
+    return Ethyl::CreateShared<NativeInputFile>(stream);
 }
 
-Shared<File> NativeProvider::OpenWrite(const std::filesystem::path &relativePath)
+Ethyl::Shared<File> NativeProvider::OpenWrite(const std::filesystem::path &relativePath)
 {
     std::ofstream stream{m_BasePath / relativePath};
     if (!stream.is_open() || stream.bad()) return nullptr;
 
-    return CreateShared<NativeOutputFile>(stream);
+    return Ethyl::CreateShared<NativeOutputFile>(stream);
 }
 }

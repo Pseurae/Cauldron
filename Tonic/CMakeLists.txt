@@ -6,7 +6,7 @@ include(CMakeSources.cmake)
 
 add_library(${PROJECT_NAME} STATIC)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-target_link_libraries(${PROJECT_NAME} PUBLIC glfw gl3w glm)
+target_link_libraries(${PROJECT_NAME} PUBLIC glfw gl3w glm Ethyl)
 
 list(TRANSFORM TONIC_SOURCES PREPEND "source/")
 list(TRANSFORM TONIC_HEADERS PREPEND "include/")

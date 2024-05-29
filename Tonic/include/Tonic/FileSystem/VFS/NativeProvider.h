@@ -41,8 +41,8 @@ public:
     NativeProvider() = default;
     NativeProvider(const std::filesystem::path &basePath);
     [[nodiscard]] virtual bool Exists(const std::filesystem::path &relativePath) override;
-    [[nodiscard]] virtual Shared<File> OpenRead(const std::filesystem::path &relativePath) override;
-    [[nodiscard]] virtual Shared<File> OpenWrite(const std::filesystem::path &relativePath) override;
+    [[nodiscard]] virtual Ethyl::Shared<File> OpenRead(const std::filesystem::path &relativePath) override;
+    [[nodiscard]] virtual Ethyl::Shared<File> OpenWrite(const std::filesystem::path &relativePath) override;
 private:
     std::filesystem::path m_BasePath = ".";
 };

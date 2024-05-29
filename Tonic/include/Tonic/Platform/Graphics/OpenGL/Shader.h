@@ -10,6 +10,7 @@ class OGLShader : public Shader
 public:
     OGLShader(Device &device, const ShaderDesc &desc);
     ~OGLShader();
+
     auto GetID() const { return m_ProgramID; }
 private:
     unsigned int m_ProgramID;

@@ -9,8 +9,8 @@ namespace Tonic::Graphics::OpenGL
 class OGLBuffer : public Buffer
 {
 public:
-    OGLBuffer(Device &device, BufferRole bufferRole, std::span<const unsigned char> data);
-    OGLBuffer(Device &device, BufferRole bufferRole, unsigned int size);
+    OGLBuffer(Device &device, std::span<const unsigned char> data, BufferRole bufferRole);
+    OGLBuffer(Device &device, unsigned int size, BufferRole bufferRole);
 
     ~OGLBuffer();
 

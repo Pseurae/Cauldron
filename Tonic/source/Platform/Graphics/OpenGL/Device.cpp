@@ -7,7 +7,8 @@
 #include "Tonic/Graphics/Blend.h"
 #include "Tonic/Graphics/Pipeline.h"
 
-#include "Tonic/Core/Window.h"
+#include "Tonic/Graphics/Window.h"
+#include <Ethyl/Assert.h>
 
 #include <GL/gl3w.h>
 
@@ -16,7 +17,7 @@
 
 namespace Tonic::Graphics::OpenGL
 {
-OGLDevice::OGLDevice(const Core::Window &window) : Device(window), m_Window(window)
+OGLDevice::OGLDevice(const Window &window) : Device(window), m_Window(window)
 {
     if (gl3wInit()) throw std::runtime_error("Could not bind OpenGL functions!");
 
@@ -31,27 +32,27 @@ OGLDevice::~OGLDevice()
     glDeleteVertexArrays(1, &m_VertexArray);
 }
 
-Shared<Buffer> OGLDevice::CreateBuffer(std::span<const unsigned char> data, BufferRole role)
+Ethyl::Shared<Buffer> OGLDevice::CreateBuffer(std::span<const unsigned char> data, BufferRole role)
 {
-    return CreateShared<OGLBuffer>(*this, role, data);
+    return Ethyl::CreateShared<OGLBuffer>(*this, data, role);
 }
 
-Shared<Buffer> OGLDevice::CreateBuffer(unsigned int size, BufferRole role)
+Ethyl::Shared<Buffer> OGLDevice::CreateBuffer(unsigned int size, BufferRole role)
 {
-    return CreateShared<OGLBuffer>(*this, role, size);
+    return Ethyl::CreateShared<OGLBuffer>(*this, size, role);
 }
 
-Shared<Shader> OGLDevice::CreateShader(const ShaderDesc &desc)
+Ethyl::Shared<Shader> OGLDevice::CreateShader(const ShaderDesc &desc)
 {
-    return CreateShared<OGLShader>(*this, desc);
+    return Ethyl::CreateShared<OGLShader>(*this, desc);
 }
 
-Shared<Texture> OGLDevice::CreateTexture(const TextureDesc &desc)
+Ethyl::Shared<Texture> OGLDevice::CreateTexture(const TextureDesc &desc)
 {
-    return CreateShared<OGLTexture>(*this, desc);
+    return Ethyl::CreateShared<OGLTexture>(*this, desc);
 }
 
-void OGLDevice::SetTextures(const std::vector<Shared<Texture>> &textures)
+void OGLDevice::SetTextures(const std::vector<Ethyl::Shared<Texture>> &textures)
 {
     for (auto i = 0; i < textures.size(); ++i)
     {
@@ -61,6 +62,11 @@ void OGLDevice::SetTextures(const std::vector<Shared<Texture>> &textures)
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, texture->GetID());
     }
+}
+
+void OGLDevice::SetViewport(const glm::ivec4 &view)
+{
+    glViewport(view.x, view.y, view.z, view.w);
 }
 
 static constexpr unsigned int getGLType(DataType type)
@@ -83,7 +89,7 @@ static constexpr unsigned int getGLType(DataType type)
         return GL_FLOAT;
     }
 
-    return GL_UNSIGNED_INT;
+    ETHYL_BREAK("Invalid DataType given.");
 }
 
 static constexpr unsigned int getGLSize(DataType type)
@@ -102,7 +108,7 @@ static constexpr unsigned int getGLSize(DataType type)
         return 4;
     }
 
-    return GL_UNSIGNED_INT;
+    ETHYL_BREAK("Invalid DataType given.");
 }
 
 unsigned int getGLBlendFunction(BlendFunction func)
@@ -121,7 +127,7 @@ unsigned int getGLBlendFunction(BlendFunction func)
         return GL_MAX;
     }
 
-    return GL_FUNC_ADD;
+    ETHYL_BREAK("Invalid BlendFunction given.");
 }
 
 unsigned int getGLBlendFactor(BlendFactor factor)
@@ -151,7 +157,8 @@ unsigned int getGLBlendFactor(BlendFactor factor)
     case BlendFactor::SourceAlphaSaturated:
         return GL_SRC_ALPHA_SATURATE;
     }
-    return GL_SRC_COLOR;
+
+    ETHYL_BREAK("Invalid BlendFactor given.");
 }
 
 
@@ -203,7 +210,7 @@ static constexpr unsigned int getGLTypeForIndexElement(IndexElementType type)
         return GL_UNSIGNED_INT;
     }
 
-    return GL_UNSIGNED_INT;
+   ETHYL_BREAK("Invalid IndexElementType given.");
 }
 
 static constexpr unsigned int getGLSizeForIndexElement(IndexElementType type)
@@ -219,13 +226,16 @@ static constexpr unsigned int getGLSizeForIndexElement(IndexElementType type)
         return 4;
     }
 
-    return 4;
+    ETHYL_BREAK("Invalid IndexElementType given.");
 }
 
 void OGLDevice::DrawIndexed(const DrawIndexedDesc &desc)
 {
     OGLBuffer *vertices = static_cast<OGLBuffer *>(desc.vertices.get());
     OGLBuffer *indices = static_cast<OGLBuffer *>(desc.indices.get());
+
+    ETHYL_ASSERT(vertices, "DrawIndexed: vertices are null.");
+    ETHYL_ASSERT(indices, "DrawIndexed: indices are null.");
 
     glBindBuffer(GL_ARRAY_BUFFER, vertices->GetID());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices->GetID());

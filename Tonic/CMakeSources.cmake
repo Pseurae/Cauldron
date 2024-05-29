@@ -1,11 +1,10 @@
-set(TONIC_SOURCES 
-    "Core/Window.cpp"
-        
+set(TONIC_SOURCES         
     "FileSystem/VFS/Drive.cpp"
     "FileSystem/VFS/NativeProvider.cpp"
 
     "Graphics/Blend.cpp"
     "Graphics/Device.cpp"
+    "Graphics/Window.cpp"
 
     "Input/Keyboard.cpp"
     "Input/Mouse.cpp"
@@ -17,11 +16,6 @@ set(TONIC_SOURCES
 )
 
 set(TONIC_HEADERS
-    "Tonic/Common/Assert.h"
-    "Tonic/Common/Pointers.h"
-
-    "Tonic/Core/Window.h"
-
     "Tonic/FileSystem/VFS/Drive.h"
     "Tonic/FileSystem/VFS/Provider.h"
     "Tonic/FileSystem/VFS/NativeProvider.h"
@@ -32,6 +26,7 @@ set(TONIC_HEADERS
     "Tonic/Graphics/Resource.h"
     "Tonic/Graphics/Shader.h"
     "Tonic/Graphics/Texture.h"
+    "Tonic/Graphics/Window.h"
 
     "Tonic/Input/Keyboard.h"
     "Tonic/Input/Keys.h"

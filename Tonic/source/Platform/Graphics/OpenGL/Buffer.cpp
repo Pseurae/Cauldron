@@ -1,7 +1,7 @@
 #include "Tonic/Platform/Graphics/OpenGL/Buffer.h"
 #include <GL/gl3w.h>
 
-#include <iostream>
+#include <Ethyl/Assert.h>
 
 namespace Tonic::Graphics::OpenGL
 {
@@ -15,12 +15,12 @@ static unsigned int GLTarget(BufferRole role)
         return GL_ARRAY_BUFFER;
     case BufferRole::Uniform:
         return GL_UNIFORM_BUFFER;
-    default:
-        throw std::runtime_error("Invalid BufferRole.");
     }
+
+    ETHYL_BREAK("Invalid BufferRole given.");
 }
 
-OGLBuffer::OGLBuffer(Device &device, BufferRole bufferRole, std::span<const unsigned char> data) : Buffer(device, bufferRole)
+OGLBuffer::OGLBuffer(Device &device, std::span<const unsigned char> data, BufferRole bufferRole) : Buffer(device, bufferRole)
 {
     auto target = GLTarget(bufferRole);
 
@@ -31,7 +31,7 @@ OGLBuffer::OGLBuffer(Device &device, BufferRole bufferRole, std::span<const unsi
     glBindBuffer(target, 0);
 }
 
-OGLBuffer::OGLBuffer(Device &device, BufferRole bufferRole, unsigned int size) : Buffer(device, bufferRole)
+OGLBuffer::OGLBuffer(Device &device, unsigned int size, BufferRole bufferRole) : Buffer(device, bufferRole)
 {
     auto target = GLTarget(bufferRole);
 

@@ -11,7 +11,7 @@ Drive::~Drive()
     }
 }
 
-void Drive::Mount(std::filesystem::path mountPath, Shared<Provider> provider)
+void Drive::Mount(std::filesystem::path mountPath, Ethyl::Shared<Provider> provider)
 {
     m_FileProviders.emplace(mountPath, provider);
 }
@@ -41,7 +41,7 @@ bool Drive::Exists(const std::filesystem::path &filePath)
     return false;
 }
 
-Shared<File> Drive::OpenRead(const std::filesystem::path &filePath)
+Ethyl::Shared<File> Drive::OpenRead(const std::filesystem::path &filePath)
 {
     if (std::filesystem::is_directory(filePath)) return nullptr;
 
@@ -60,7 +60,7 @@ Shared<File> Drive::OpenRead(const std::filesystem::path &filePath)
     return nullptr;
 }
 
-Shared<File> Drive::OpenWrite(const std::filesystem::path &filePath)
+Ethyl::Shared<File> Drive::OpenWrite(const std::filesystem::path &filePath)
 {
     if (m_ReadOnly) return nullptr;
 

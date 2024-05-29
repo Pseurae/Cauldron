@@ -1,7 +1,7 @@
 #ifndef TONIC_GRAPHICS_DRAW_H
 #define TONIC_GRAPHICS_DRAW_H
 
-#include "Tonic/Common/Pointers.h"
+#include <Ethyl/Pointers.h>
 
 namespace Tonic::Graphics
 {
@@ -22,7 +22,7 @@ enum class IndexElementType
 struct DrawIndexedDesc final
 {
     DrawMode mode;
-    Shared<Buffer> &vertices, &indices;
+    Ethyl::Shared<Buffer> &vertices, &indices;
     unsigned int count, start;
     IndexElementType type;
 };

@@ -1,5 +1,6 @@
 #include "Tonic/Platform/Graphics/OpenGL/Texture.h"
 #include <GL/gl3w.h>
+#include <Ethyl/Assert.h>
 
 namespace Tonic::Graphics::OpenGL
 {
@@ -17,7 +18,7 @@ static int getWrapMode(TextureWrapMode mode)
         return GL_CLAMP_TO_BORDER;
     }
 
-    return GL_CLAMP_TO_BORDER;
+    ETHYL_BREAK("Invalid TextureWrapMode given.");
 }
 
 static int getFilterType(TextureFilterType type)
@@ -30,7 +31,7 @@ static int getFilterType(TextureFilterType type)
         return GL_LINEAR;
     }
 
-    return GL_LINEAR;
+    ETHYL_BREAK("Invalid TextureFilterType given.");
 }
 
 OGLTexture::OGLTexture(Device &device, const TextureDesc &desc) : Texture(device)

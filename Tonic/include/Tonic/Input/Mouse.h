@@ -14,9 +14,9 @@ public:
     void Update(MouseButton button, Action action, KeyMod mods);
     void SwapState() { m_LastButtons = m_CurrentButtons; }
 
-    bool Held(MouseButton button) { return m_CurrentButtons[(int)button] && m_LastButtons[(int)button]; }
-    bool Pressed(MouseButton button) { return m_CurrentButtons[(int)button] && !m_LastButtons[(int)button]; }
-    bool Released(MouseButton button) { return !m_CurrentButtons[(int)button] && m_LastButtons[(int)button]; }
+    bool Held(MouseButton button) const { return m_CurrentButtons[(int)button] && m_LastButtons[(int)button]; }
+    bool Pressed(MouseButton button) const { return m_CurrentButtons[(int)button] && !m_LastButtons[(int)button]; }
+    bool Released(MouseButton button) const { return !m_CurrentButtons[(int)button] && m_LastButtons[(int)button]; }
 
 private:
     KeyMod m_Mods;

@@ -2,7 +2,7 @@
 
 namespace Tonic::Graphics
 {
-Device::Device(const Core::Window &window)
+Device::Device(const Window &window)
 {
 }
 }
