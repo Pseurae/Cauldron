@@ -11,13 +11,13 @@ struct UniqueID
 {
 private:
     template<typename>
-    static constexpr std::string_view GetFuncName()
+    static consteval std::string_view GetFuncName()
     {
         return std::source_location::current().function_name();
     }
 
     // https://stackoverflow.com/a/2112111
-    static constexpr std::size_t __hash(const char *i)
+    static consteval std::size_t __hash(const char *i)
     {
         return *i ?
             static_cast<std::size_t>(*i) + 33 * __hash(i + 1) :

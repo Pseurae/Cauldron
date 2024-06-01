@@ -9,6 +9,8 @@
 #include <functional>
 #include <stdio.h>
 #include <unordered_map>
+#include <string>
+#include <string.h>
 
 namespace Potion::Core
 {
@@ -18,7 +20,7 @@ class EventBus final
 private:
     struct Entry
     {
-        enum class Type { Function, Functor };
+        enum class Type { Function, Functor, MemberFunction };
 
         Type type;
         void *instance;
@@ -36,13 +38,28 @@ private:
             return std::is_invocable_v<Fn, typename Ethyl::Traits::Function<Fn>::Class&, const Event &> || std::is_invocable_v<Fn, typename Ethyl::Traits::Function<Fn>::Class&>;
     }() && std::is_same_v<Event, std::remove_pointer_t<std::remove_cvref_t<Event>>> && (std::is_member_function_pointer_v<Fn> == MemberFunc);
 
+    static constexpr std::size_t __hash(const char *i)
+    {
+        return *i ?
+            static_cast<std::size_t>(*i) + 33 * __hash(i + 1) :
+            5381;
+    }
+
+    template<typename Class, typename Ret, typename... Args>
+    static inline constexpr std::size_t GetClassMemberHash(Ret(Class::*member)(Args...))
+    {
+        std::vector<char> bytes(sizeof(member));
+        memcpy(bytes.data(), &member, sizeof(member));
+        return std::hash<std::string>{}(std::string(bytes.data(), sizeof(member))) ^ (typeid(Class).hash_code() << 2);
+    }
+
     template<typename Fn>
     static inline constexpr std::pair<size_t, Entry::Type> GetEntryIDData(void *instance, Fn callback)
     {
         if constexpr (Ethyl::Traits::Function<Fn>::IsFunctor)
             return { typeid(Fn).hash_code(), Entry::Type::Functor };
         else if constexpr (std::is_member_function_pointer_v<Fn>)
-            return { typeid(Fn).hash_code(), Entry::Type::Function };
+            return { GetClassMemberHash(callback) ^ ((size_t)instance << 1), Entry::Type::MemberFunction };
         else
             return { (size_t)callback, Entry::Type::Function };
     }
@@ -76,14 +93,20 @@ public:
         if constexpr(std::is_empty_v<Event>) {
             union { Event event; };
             Post(event);
-        } else if constexpr(requires {Event(std::forward<Args>(args)...); }) {
+        } 
+        else if constexpr(requires { Event(std::forward<Args>(args)...); }) 
+        {
             Event event(std::forward<Args>(args)...);
             Post(event);
-        } else if constexpr(requires {Event{std::forward<Args>(args)...}; }) {
+        } 
+        else if constexpr(requires { Event{std::forward<Args>(args)...}; }) 
+        {
             Event event{std::forward<Args>(args)...};
             Post(event);
-        } else {
-            [] <bool T = false>() {
+        } 
+        else 
+        {
+            []<bool T = false>() {
                 static_assert(T, "Event type not constructible from args");
             }();
         }
@@ -92,7 +115,7 @@ public:
     template<typename Event>
     inline void Post(const Event &event)
     {
-        auto range = m_Handlers.equal_range(m_Indexer.Get<Event>());
+        auto range = m_Handlers.equal_range(Ethyl::Traits::UniqueID<Event>::value);
 
         for (auto it = range.first; it != range.second; ++it)
             it->second.delegate(static_cast<const void *>(&event));
@@ -136,7 +159,7 @@ private:
         };
 
         Entry entry = { type, instance, id, delegate };
-        m_Handlers.emplace(m_Indexer.Get<Event>(), entry);
+        m_Handlers.emplace(Ethyl::Traits::UniqueID<Event>::value, entry);
     }
 
     template<typename Event, typename Fn>
@@ -158,7 +181,6 @@ private:
         }
     }
 
-    Ethyl::Types::TypeIndexer m_Indexer;
     std::unordered_multimap<size_t, Entry> m_Handlers;
 };
 };

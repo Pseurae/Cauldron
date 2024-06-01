@@ -8,7 +8,7 @@
 
 namespace Ethyl::Types
 {
-class TypeIndexer
+class TypeIndexer final
 {
 public:
     template<typename T>
