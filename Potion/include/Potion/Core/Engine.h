@@ -9,7 +9,7 @@
 #include <Ethyl/Pointers.h>
 
 #include "Potion/Core/Events.h"
-#include "Potion/Core/Subsystems.h"
+#include "Potion/Core/Services.h"
 
 namespace Potion::Core
 {
@@ -34,6 +34,12 @@ struct PostRender {};
 struct PreShutdown {};
 struct Shutdown {};
 struct PostShutdown {};
+
+template<typename T>
+struct RegisteredService {};
+
+template<typename T>
+struct UnregisteredService {};
 };
 
 class Engine final
@@ -52,7 +58,7 @@ private:
         friend class Engine;
 
         EState m_State;
-        Subsystems m_Subsystems;
+        Services m_Services;
         EventBus m_EventBus;
     };
 
@@ -61,7 +67,7 @@ private:
     static Context &CurrentContext();
 
 public:
-    static Subsystems &Subsystems();
+    static Services &Services();
     static EventBus &EventBus();
 
     static void Initialize();

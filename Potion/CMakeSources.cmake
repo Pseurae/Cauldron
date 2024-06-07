@@ -5,5 +5,4 @@ set(POTION_SOURCES
 set(POTION_HEADERS
     "Potion/Core/Engine.h"
     "Potion/Core/Events.h"
-    "Potion/Core/Subsystems.h"
 )

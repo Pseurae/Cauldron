@@ -8,7 +8,7 @@
 
 namespace Ethyl::Types
 {
-class TypeVector
+class TypeVector final
 {
 public:
     TypeVector() = default;
@@ -34,26 +34,53 @@ public:
         return std::any_cast<T&>(m_Values[index]);
     }
 
-    template<typename T>
-    [[nodiscard]] inline T &Get()
+    template<typename... T>
+    [[nodiscard]] inline decltype(auto) Get()
     {
-        const auto index = m_Indexer.Get<T>();
-        ETHYL_ASSERT(index < m_Values.size(), "An instance of {} does not exist!", Ethyl::Traits::Name<T>::value);
-        return std::any_cast<T&>(m_Values[index]);
+        if constexpr (Traits::Arguments<T...>::Arity == 1)
+        {
+            const auto index = m_Indexer.Get<T...>();
+            ETHYL_ASSERT(index < m_Values.size(), "An instance of {} does not exist!", Ethyl::Traits::Name<T...>::value);
+            return (std::any_cast<T&>(m_Values[index]), ...);
+        }
+        else
+        {
+            return std::forward_as_tuple(Get<T>()...);
+        }
     }
 
-    template<typename T>
+    template<typename... T>
     inline void Remove()
     {
-        const auto index = m_Indexer.Get<T>();
-        if (m_Values.size() > index) m_Values[index].reset();
+        if constexpr (Traits::Arguments<T...>::Arity == 1)
+        {
+            const auto index = m_Indexer.Get<T...>();
+            if (m_Values.size() > index) m_Values[index].reset();
+        }
+        else
+        {
+            (Remove<T>(), ...);
+        }
     }
 
-    template<typename T>
+    template<typename... T>
     [[nodiscard]] inline bool Has()
     {
-        const auto index = m_Indexer.Get<T>();
-        return m_Values.size() > index && m_Values[index].has_value();
+        if constexpr (Traits::Arguments<T...>::Arity == 1)
+        {
+            const auto index = m_Indexer.Get<T...>();
+            return m_Values.size() > index && m_Values[index].has_value();
+        }
+        else
+        {
+            return (Has<T>() && ...);
+        }
+    }
+
+    template<typename... T>
+    [[nodiscard]] inline bool HasAny()
+    {
+        return (Has<T>() || ...);
     }
 
 private:

@@ -11,9 +11,9 @@ namespace Potion::Core
         return *m_Context;
     }
 
-    Subsystems &Engine::Subsystems()
+    Services &Engine::Services()
     {
-        return CurrentContext().m_Subsystems;
+        return CurrentContext().m_Services;
     }
 
     EventBus &Engine::EventBus()
