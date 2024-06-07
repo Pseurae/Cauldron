@@ -26,7 +26,7 @@ class System : public _::BaseSystem
 {
 public:
     using RequiredComponents = Ethyl::Traits::Arguments<Arguments...>;
-    virtual void Invoke(EntityID, Arguments...) {};
+    // virtual void Invoke(EntityID, Arguments...) {};
 };
 }
 

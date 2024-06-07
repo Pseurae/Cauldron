@@ -10,7 +10,6 @@
 #include <vector>
 #include <bitset>
 #include <functional>
-#include <iostream>
 #include <ranges>
 #include <set>
 
@@ -96,12 +95,14 @@ private:
         return *static_cast<System *>(m_Systems[idx].get());
     }
 
-    template<typename System, std::size_t... I>
-    inline void RunSystemImpl(System &system, std::index_sequence<I...>)
+    template<typename System, std::size_t... I1, std::size_t... I2, typename FuncTraits = Ethyl::Traits::Function<decltype(&System::Invoke)>>
+    inline void RunSystemImpl(System &system, std::index_sequence<I1...>, std::index_sequence<I2...>)
     {
-        ForEach<typename System::RequiredComponents::SanitizedTypes::template NthType<I>...>([&system](EntityID id, typename System::RequiredComponents::Types::template NthType<I>... args) {
-            system.Invoke(id, args...);
-        });
+        ForEach<typename System::RequiredComponents::Types::template NthType<I1>...>(
+            [&system](typename FuncTraits::Types::template NthType<I2>... args) {
+                system.Invoke(args...);
+            }
+        );
     }
 
     inline void RemoveEntityFromOldSystems(EntityID id)
@@ -214,6 +215,7 @@ public:
     }
 
     template<typename System, typename... Args>
+    requires(std::is_same_v<typename System::RequiredComponents::Types, typename System::RequiredComponents::SanitizedTypes>)
     [[nodiscard]] System& RegisterSystem(Args&&... args) 
     {
         ETHYL_ASSERT(m_Systems.size() <= m_SystemIndexer.Get<System>() || !m_Systems[m_SystemIndexer.Get<System>()], "{} is already registered!", Ethyl::Traits::Name<System>::value);
@@ -223,7 +225,7 @@ public:
     template<typename System>
     void RunSystem(System &system)
     {
-        RunSystemImpl(system, std::make_index_sequence<System::RequiredComponents::Arity>{});
+        RunSystemImpl(system, std::make_index_sequence<System::RequiredComponents::Arity>{}, std::make_index_sequence<Ethyl::Traits::Function<decltype(&System::Invoke)>::Arity>{});
     }
 
     template<typename T, typename System = std::remove_pointer_t<std::remove_cvref_t<T>>>

@@ -18,20 +18,22 @@ struct Velocity
     int x, y;
 };
 
-struct PhysicsSystem : public System<Position&, Velocity&>
+struct PhysicsSystem : public System<Position, Velocity>
 {
-    void Invoke(EntityID id, Position& pos, Velocity& vel) override
+    void Invoke(EntityID id, Position& pos, Velocity& vel)
     {
         std::cout << "Physics system" << std::endl;
         std::cout << "Entity ID: " << id << std::endl;
         std::cout << "Pos: " << pos.x << " " << pos.y << std::endl;
         std::cout << "Vel: " << vel.x << " " << vel.y << std::endl;
+
+        vel.y = 100;
     };
 };
 
-struct PositionSystem : public System<Position&>
+struct PositionSystem : public System<Position>
 {
-    void Invoke(EntityID id, Position& pos) override
+    void Invoke(EntityID id, Position& pos)
     {
         std::cout << "Position system" << std::endl;
         std::cout << "Entity ID: " << id << std::endl;
@@ -56,7 +58,7 @@ int main(int, char *[])
         Engine::Services().Create<TestService1>();
         Engine::Services().Create<TestService2>();
 
-        std::cout << Engine::Services().Has<TestService1, TestService2, TestService3>() << std::endl;
+        // std::cout << Engine::Services().Has<TestService1, TestService2, TestService3>() << std::endl;
 
         World world;
         auto entity1 = world.CreateEntity();
@@ -68,6 +70,7 @@ int main(int, char *[])
         //     std::cout << id << std::endl;
         //     std::cout << pos.x << " " << pos.y << std::endl;
         //     std::cout << vel.x << " " << vel.y << std::endl;
+        //     vel.y = 100;
         // });
 
         // t();
