@@ -1,7 +1,7 @@
 #ifndef ETHYL_TRAITS_ARGUMENTS_H
 #define ETHYL_TRAITS_ARGUMENTS_H
 
-#include <type_traits>
+#include "Ethyl/Traits/Sanitize.h"
 
 namespace Ethyl::Traits
 {
@@ -17,7 +17,7 @@ struct Arguments
 
     enum { Arity = sizeof...(Args) };
     using Types = Holder<Args...>;
-    using SanitizedTypes = Holder<std::remove_pointer_t<std::remove_cvref_t<Args>>...>;
+    using SanitizedTypes = Holder<Sanitize<Args>...>;
 };
 }
 

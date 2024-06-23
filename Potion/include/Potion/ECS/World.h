@@ -5,6 +5,9 @@
 #include "Potion/ECS/ComponentPool.h"
 #include "Potion/ECS/System.h"
 #include <Ethyl/Pointers.h>
+#include <Ethyl/Assert.h>
+#include <Ethyl/Types/TypeIndexer.h>
+#include <Ethyl/Traits/Name.h>
 #include <Ethyl/Traits/Function.h>
 #include <unordered_map>
 #include <vector>

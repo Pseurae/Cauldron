@@ -10,10 +10,9 @@
 #include <Tonic/Graphics/Texture.h>
 #include <Tonic/Platform/Graphics/OpenGL/Device.h>
 
-#include <Tonic/Common/Pointers.h>
+#include <Ethyl/Pointers.h>
 
 #include <Tonic/FileSystem/VFS/Drive.h>
-#include <Tonic/FileSystem/VFS/NativeProvider.h>
 
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>

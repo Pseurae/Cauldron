@@ -5,12 +5,11 @@
 #include <Ethyl/Types/TypeIndexer.h>
 #include <Ethyl/Pointers.h>
 #include <unordered_map>
-#include <concepts>
 #include <functional>
 #include <stdio.h>
-#include <unordered_map>
 #include <string>
 #include <string.h>
+#include <type_traits>
 
 namespace Potion::Core
 {
@@ -18,51 +17,39 @@ namespace Potion::Core
 class EventBus final 
 {
 private:
+    template<typename Event, auto Fn>
+    static void DelegateCallback(void *instance, void *event)
+    {
+        using FuncTraits = Ethyl::Traits::Function<decltype(Fn)>;
+        constexpr auto TakeNoArgs = FuncTraits::Arity == 0;
+
+        if constexpr (FuncTraits::IsMemberFunction)
+        {
+            ETHYL_ASSERT(instance, "Instance is a nullptr!");
+            if constexpr (TakeNoArgs) (static_cast<typename FuncTraits::Class *>(instance)->*Fn)();
+            else (static_cast<typename FuncTraits::Class *>(instance)->*Fn)(*static_cast<Event *>(event));
+        }
+        else
+        {
+            if constexpr (TakeNoArgs) Fn();
+            else Fn(*static_cast<Event *>(event));
+        }
+    }
+
     struct Entry
     {
-        enum class Type { Function, Functor, MemberFunction };
-
-        Type type;
         void *instance;
-        size_t id;
-
-        std::function<void(const void *)> delegate;
+        void (*delegate)(void *instance, void *event);
     };
 
-    template<typename Event, typename Fn, bool MemberFunc = false>
-    static inline constexpr auto CanBeCallback = []()
-    {
+    template<typename Event, typename Fn, bool MemberFunc = false, typename Class = typename Ethyl::Traits::Function<Fn>::Class>
+    static inline constexpr auto CanBeCallback = std::is_same_v<Event, Ethyl::Traits::Sanitize<Event>> && std::is_member_function_pointer_v<Fn> == MemberFunc && 
+    []() {
         if constexpr (!MemberFunc)
-            return std::is_invocable_v<Fn, const Event &> || std::is_invocable_v<Fn>;
+            return std::is_invocable_v<Fn, Event&> || std::is_invocable_v<Fn>;
         else
-            return std::is_invocable_v<Fn, typename Ethyl::Traits::Function<Fn>::Class&, const Event &> || std::is_invocable_v<Fn, typename Ethyl::Traits::Function<Fn>::Class&>;
-    }() && std::is_same_v<Event, std::remove_pointer_t<std::remove_cvref_t<Event>>> && (std::is_member_function_pointer_v<Fn> == MemberFunc);
-
-    static constexpr std::size_t __hash(const char *i)
-    {
-        return *i ?
-            static_cast<std::size_t>(*i) + 33 * __hash(i + 1) :
-            5381;
-    }
-
-    template<typename Class, typename Ret, typename... Args>
-    static inline constexpr std::size_t GetClassMemberHash(Ret(Class::*member)(Args...))
-    {
-        std::vector<char> bytes(sizeof(member));
-        memcpy(bytes.data(), &member, sizeof(member));
-        return std::hash<std::string>{}(std::string(bytes.data(), sizeof(member))) ^ (typeid(Class).hash_code() << 2);
-    }
-
-    template<typename Fn>
-    static inline constexpr std::pair<size_t, Entry::Type> GetEntryIDData(void *instance, Fn callback)
-    {
-        if constexpr (Ethyl::Traits::Function<Fn>::IsFunctor)
-            return { typeid(Fn).hash_code(), Entry::Type::Functor };
-        else if constexpr (std::is_member_function_pointer_v<Fn>)
-            return { GetClassMemberHash(callback) ^ ((size_t)instance << 1), Entry::Type::MemberFunction };
-        else
-            return { (size_t)callback, Entry::Type::Function };
-    }
+            return std::is_invocable_v<Fn, Class&, Event&> || std::is_invocable_v<Fn, Class&>;
+    }();
 
 public:
     EventBus() = default;
@@ -73,18 +60,32 @@ public:
     EventBus& operator=(EventBus&&) = default;
     EventBus& operator=(const EventBus&) = default;
 
-    template<typename Event, typename Fn>
-    requires(CanBeCallback<Event, Fn>)
-    inline void Register(Fn callback)
+    template<auto Fn, typename FuncTraits = Ethyl::Traits::Function<decltype(Fn)>, typename = std::enable_if_t<FuncTraits::Arity == 1>, typename Event = typename FuncTraits::SanitizedTypes::template NthType<0>>
+    requires(CanBeCallback<Event, decltype(Fn)>)
+    inline void Register()
     {
-        AddHandler<Event>(nullptr, callback);
+        AddHandler<Event, Fn>(nullptr);
     }
 
-    template<typename Event, typename Fn>
-    requires(CanBeCallback<Event, Fn, true>)
-    inline void Register(void *instance, Fn callback)
+    template<auto Fn, typename FuncTraits = Ethyl::Traits::Function<decltype(Fn)>, typename = std::enable_if_t<FuncTraits::Arity == 1>, typename Event = typename FuncTraits::SanitizedTypes::template NthType<0>>
+    requires(CanBeCallback<Event, decltype(Fn)>)
+    inline void Register(FuncTraits::Class *instance)
     {
-        AddHandler<Event>(instance, callback);
+        AddHandler<Event, Fn>(instance);
+    }
+
+    template<typename Event, auto Fn>
+    requires(CanBeCallback<Event, decltype(Fn)>)
+    inline void Register()
+    {
+        AddHandler<Event, Fn>(nullptr);
+    }
+
+    template<typename Event, auto Fn>
+    requires(CanBeCallback<Event, decltype(Fn), true>)
+    inline void Register(Ethyl::Traits::Function<decltype(Fn)>::Class *instance)
+    {
+        AddHandler<Event, Fn>(instance);
     }
 
     template<typename Event, typename... Args>
@@ -113,26 +114,26 @@ public:
     }
 
     template<typename Event>
-    inline void Post(const Event &event)
+    inline void Post(Event &event)
     {
         auto range = m_Handlers.equal_range(Ethyl::Traits::UniqueID<Event>::value);
 
         for (auto it = range.first; it != range.second; ++it)
-            it->second.delegate(static_cast<const void *>(&event));
+            it->second.delegate(it->second.instance, static_cast<void *>(&event));
     }
 
-    template<typename Event, typename Fn>
-    requires(CanBeCallback<Event, Fn>)
-    inline void Remove(Fn callback)
+    template<typename Event, auto Fn>
+    requires(CanBeCallback<Event, decltype(Fn)>)
+    inline void Remove()
     {
-        RemoveHandler<Event>(nullptr, callback);
+        RemoveHandler<Event, Fn>(nullptr);
     }
 
-    template<typename Event, typename Fn>
-    requires(CanBeCallback<Event, Fn, true>)
-    inline void Remove(void *instance, Fn callback)
+    template<typename Event, auto Fn>
+    requires(CanBeCallback<Event, decltype(Fn), true>)
+    inline void Remove(void *instance)
     {
-        RemoveHandler<Event>(instance, callback);
+        RemoveHandler<Event, Fn>(instance);
     }
 
     inline void ClearAll()
@@ -141,37 +142,21 @@ public:
     }
 
 private:
-    template<typename Event, typename Fn>
-    inline void AddHandler(void *instance, Fn callback)
+    template<typename Event, auto Fn>
+    inline void AddHandler(void *instance)
     {
-        auto [id, type] = GetEntryIDData(instance, callback);
-        auto delegate = [classInstance = static_cast<typename Ethyl::Traits::Function<Fn>::Class *>(instance), func = std::forward<Fn>(callback)](const void *event) {
-            if constexpr (std::is_member_function_pointer_v<Fn> && !std::is_same_v<typename Ethyl::Traits::Function<Fn>::Class, void>)
-            {
-                if constexpr (Ethyl::Traits::Function<Fn>::Arity == 0) (classInstance->*func)();
-                else (classInstance->*func)(*static_cast<const Event *>(event));
-            }
-            else
-            {
-                if constexpr (Ethyl::Traits::Function<Fn>::Arity == 0) func();
-                else func(*static_cast<const Event *>(event));
-            }
-        };
-
-        Entry entry = { type, instance, id, delegate };
+        Entry entry = { instance, DelegateCallback<Event, Fn> };
         m_Handlers.emplace(Ethyl::Traits::UniqueID<Event>::value, entry);
     }
 
-    template<typename Event, typename Fn>
-    inline void RemoveHandler(void *instance, Fn callback)
+    template<typename Event, auto Fn>
+    inline void RemoveHandler(Ethyl::Traits::Function<decltype(Fn)>::Class *instance)
     {
-        auto [id, type] = GetEntryIDData(instance, callback);
-
         for (auto it = m_Handlers.begin(); it != m_Handlers.end();)
         {
             const auto &entry = it->second;
 
-            if (entry.id == id && entry.type == type && entry.instance == instance)
+            if (entry.instance == instance && entry.delegate == DelegateCallback<Event, Fn>)
             {
                 it = m_Handlers.erase(it);
                 break;

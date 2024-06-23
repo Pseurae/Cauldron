@@ -1,6 +1,6 @@
 set(TONIC_SOURCES         
     "FileSystem/VFS/Drive.cpp"
-    "FileSystem/VFS/NativeProvider.cpp"
+    "FileSystem/VFS/Provider.cpp"
 
     "Graphics/Blend.cpp"
     "Graphics/Device.cpp"
@@ -17,8 +17,6 @@ set(TONIC_SOURCES
 
 set(TONIC_HEADERS
     "Tonic/FileSystem/VFS/Drive.h"
-    "Tonic/FileSystem/VFS/Provider.h"
-    "Tonic/FileSystem/VFS/NativeProvider.h"
 
     "Tonic/Graphics/Blend.h"
     "Tonic/Graphics/Buffer.h"

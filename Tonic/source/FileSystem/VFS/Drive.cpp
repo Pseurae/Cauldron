@@ -1,83 +1,61 @@
+#include <Ethyl/Assert.h>
 #include "Tonic/FileSystem/VFS/Drive.h"
 
 namespace Tonic::FileSystem::VFS
 {
-Drive::~Drive()
+std::vector<char> Drive::ReadFile(const std::filesystem::path &filePath)
 {
-    for (const auto &file : m_OpenedFiles)
+    for (const auto &[basePath, provider] : m_Providers)
     {
-        if (file.expired()) continue;
-        file.lock()->Close();
+        auto resolvedPath = ResolvePath(basePath, filePath);
+        if (!resolvedPath.empty() && provider->FileExists(resolvedPath)) return provider->ReadFile(resolvedPath);
+    }
+
+    return {};
+}
+
+void Drive::WriteFile(const std::filesystem::path &filePath, const std::vector<char> &content, bool overwrite)
+{
+    for (const auto &[basePath, provider] : m_Providers)
+    {
+        auto resolvedPath = ResolvePath(basePath, filePath);
+        if (!resolvedPath.empty() && overwrite || !provider->FileExists(resolvedPath)) provider->WriteFile(resolvedPath, content);
     }
 }
 
-void Drive::Mount(std::filesystem::path mountPath, Ethyl::Shared<Provider> provider)
+void Drive::IncludePath(const std::filesystem::path &folderPath)
 {
-    m_FileProviders.emplace(mountPath, provider);
+    ETHYL_ASSERT(std::filesystem::is_directory(folderPath), "Path is not a directory!");
+    ETHYL_ASSERT(std::find(m_SearchPaths.begin(), m_SearchPaths.end(), folderPath) == m_SearchPaths.end(), "Search path already exists!");
+    m_SearchPaths.push_back(folderPath);
 }
 
-void Drive::Unmount(std::filesystem::path mountPath)
+void Drive::CheckIfPathMounted(const std::filesystem::path &mountPoint)
 {
-    m_FileProviders.erase(mountPath);
+    ETHYL_ASSERT(m_Providers.find(mountPoint) == m_Providers.end(), "A Provider has already been mounted at {}!", mountPoint.string());
 }
 
-static std::filesystem::path TryResolvePath(const std::filesystem::path &filePath, const std::filesystem::path &basePath)
+bool Drive::FileExists(const std::filesystem::path &filePath)
 {
-    auto relativePath = std::filesystem::relative(filePath, basePath);
-    if (relativePath.empty() || relativePath.string().starts_with("../")) return "";
-    return relativePath;
-}
-
-bool Drive::Exists(const std::filesystem::path &filePath)
-{
-    if (std::filesystem::is_directory(filePath)) return false;
-
-    for (auto const &[path, provider] : m_FileProviders)
+    for (const auto &[basePath, provider] : m_Providers)
     {
-        auto relativePath = TryResolvePath(filePath, path);
-        if (relativePath.empty()) continue;
-        if (provider->Exists(relativePath)) return true;
+        auto resolvedPath = ResolvePath(basePath, filePath);
+        if (!resolvedPath.empty()) return provider->FileExists(resolvedPath);
     }
+
     return false;
 }
 
-Ethyl::Shared<File> Drive::OpenRead(const std::filesystem::path &filePath)
+std::filesystem::path Drive::ResolvePath(const std::filesystem::path &basePath, const std::filesystem::path &filePath)
 {
-    if (std::filesystem::is_directory(filePath)) return nullptr;
-
-    for (auto const &[path, provider] : m_FileProviders)
-    {
-        auto relativePath = TryResolvePath(filePath, path);
-        if (relativePath.empty()) continue;
-
-        if (auto ptr = provider->OpenRead(relativePath))
-        {
-            m_OpenedFiles.push_back(ptr);
-            return ptr;
-        }
-    }
-
-    return nullptr;
+    auto relPath = std::filesystem::relative(filePath, basePath);
+    if (relPath.empty() || relPath.string().starts_with("..")) return "";
+    return relPath;
 }
 
-Ethyl::Shared<File> Drive::OpenWrite(const std::filesystem::path &filePath)
+void Drive::RegisterProviderInternal(const std::filesystem::path &mountPoint, Ethyl::Shared<Provider> provider)
 {
-    if (m_ReadOnly) return nullptr;
-
-    if (std::filesystem::is_directory(filePath)) return nullptr;
-
-    for (auto const &[path, provider] : m_FileProviders)
-    {
-        auto relativePath = TryResolvePath(filePath, path);
-        if (relativePath.empty()) continue;
-
-        if (auto ptr = provider->OpenWrite(relativePath))
-        {
-            m_OpenedFiles.push_back(ptr);
-            return ptr;
-        }
-    }
-
-    return nullptr;
+    CheckIfPathMounted(mountPoint);
+    m_Providers[mountPoint] = std::move(provider);
 }
 }

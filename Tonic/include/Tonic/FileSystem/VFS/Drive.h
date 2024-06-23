@@ -2,30 +2,43 @@
 #define TONIC_FILESYSTEM_VFS_DRIVE_H
 
 #include <filesystem>
+#include <vector>
 #include <unordered_map>
 #include <list>
 #include <Ethyl/Pointers.h>
 #include "Tonic/FileSystem/VFS/Provider.h"
+#include <type_traits>
+#include <optional>
 
 namespace Tonic::FileSystem::VFS
 {
-class Drive /* final */
+class Drive final
 {
 public:
     Drive() = default;
-    Drive(bool readOnly) : m_ReadOnly(readOnly) {}
-    virtual ~Drive();
-    void Mount(std::filesystem::path mountPath, Ethyl::Shared<Provider> provider);
-    void Unmount(std::filesystem::path mountPath);
+    std::vector<char> ReadFile(const std::filesystem::path &filePath);
+    void WriteFile(const std::filesystem::path &filePath, const std::vector<char> &content, bool overwrite = false);
 
-    [[nodiscard]] bool Exists(const std::filesystem::path &filePath);
-    [[nodiscard]] Ethyl::Shared<File> OpenRead(const std::filesystem::path &filePath);
-    [[nodiscard]] Ethyl::Shared<File> OpenWrite(const std::filesystem::path &filePath);
+    void IncludePath(const std::filesystem::path &folderPath);
+    void CheckIfPathMounted(const std::filesystem::path &mountPoint);
+
+    template<typename TProvider, typename... Args>
+    requires(std::is_base_of_v<Provider, TProvider>)
+    inline auto RegisterProvider(const std::filesystem::path &mountPoint, Args&&... args)
+    {
+        if constexpr (std::is_aggregate_v<TProvider>) RegisterProviderInternal(mountPoint, Ethyl::Shared<TProvider>(new TProvider{std::forward<Args>(args)...}));
+        else RegisterProviderInternal(mountPoint, Ethyl::Shared<TProvider>(new TProvider(std::forward<Args>(args)...)));
+    }
+
+    inline void ClearAllProviders() { m_Providers.clear(); }
+    bool FileExists(const std::filesystem::path &path);
+
 private:
-    std::unordered_map<std::filesystem::path, Ethyl::Shared<Provider>> m_FileProviders;
-    std::list<Ethyl::WeakRef<File>> m_OpenedFiles;
+    void RegisterProviderInternal(const std::filesystem::path &mountPoint, Ethyl::Shared<Provider> provider);
 
-    const bool m_ReadOnly = false;
+    std::filesystem::path ResolvePath(const std::filesystem::path &basePath, const std::filesystem::path &filePath);
+    std::vector<std::filesystem::path> m_SearchPaths;
+    std::unordered_map<std::filesystem::path, Ethyl::Shared<Provider>> m_Providers;
 };
 }
 

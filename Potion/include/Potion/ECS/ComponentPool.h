@@ -2,6 +2,7 @@
 #define POTION_ECS_COMPONENTPOOL_H
 
 #include "Potion/ECS/Constants.h"
+#include <Ethyl/Assert.h>
 
 namespace Potion::ECS::_
 {

@@ -12,3 +12,5 @@ list(TRANSFORM TONIC_SOURCES PREPEND "source/")
 list(TRANSFORM TONIC_HEADERS PREPEND "include/")
 
 target_sources(${PROJECT_NAME} PUBLIC ${TONIC_SOURCES} ${TONIC_HEADERS})
+
+add_subdirectory(tests)

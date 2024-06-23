@@ -1,15 +1,9 @@
 #ifndef POTION_CORE_ENGINE_H
 #define POTION_CORE_ENGINE_H
 
-#include <Tonic/Input/Keyboard.h>
-#include <Tonic/Input/Mouse.h>
-
-#include <Tonic/Graphics/Window.h>
-#include <Tonic/Graphics/Device.h>
 #include <Ethyl/Pointers.h>
 
 #include "Potion/Core/Events.h"
-#include "Potion/Core/Services.h"
 
 namespace Potion::Core
 {
@@ -58,17 +52,15 @@ private:
         friend class Engine;
 
         EState m_State;
-        Services m_Services;
         EventBus m_EventBus;
     };
 
     // No need for this to be a unique_ptr
-    static std::unique_ptr<Context> m_Context;
+    static Ethyl::Unique<Context> m_Context;
     static Context &CurrentContext();
 
 public:
-    static Services &Services();
-    static EventBus &EventBus();
+    static EventBus &EventBus() { return CurrentContext().m_EventBus; }
 
     static void Initialize();
     static void Ignite();

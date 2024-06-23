@@ -41,22 +41,11 @@ struct PositionSystem : public System<Position>
     };
 };
 
-struct TestService1 : public Service
-{};
-
-struct TestService2 : public Service
-{};
-
-struct TestService3 : public Service
-{};
-
 int main(int, char *[]) 
 { 
     try 
     {
         Engine::Initialize();
-        Engine::Services().Create<TestService1>();
-        Engine::Services().Create<TestService2>();
 
         // std::cout << Engine::Services().Has<TestService1, TestService2, TestService3>() << std::endl;
 

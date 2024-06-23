@@ -12,3 +12,5 @@ list(TRANSFORM POTION_SOURCES PREPEND "source/")
 list(TRANSFORM POTION_HEADERS PREPEND "include/")
 
 target_sources(${PROJECT_NAME} PUBLIC ${POTION_SOURCES} ${POTION_HEADERS})
+
+add_subdirectory(tests)

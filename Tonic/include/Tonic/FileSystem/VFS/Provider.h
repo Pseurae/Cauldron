@@ -2,28 +2,28 @@
 #define TONIC_FILESYSTEM_VFS_PROVIDER_H
 
 #include <filesystem>
-#include <span>
-#include <Ethyl/Pointers.h>
+#include <vector>
+#include <string>
 
 namespace Tonic::FileSystem::VFS
 {
-class File
+struct Provider
 {
-public:
-    virtual void Close() = 0;
-
-    virtual size_t Read(void *buffer, size_t elemSize, size_t count) = 0;
-    virtual size_t Write(const void *buffer, size_t elemSize, size_t count) = 0;
-    virtual size_t Seek() = 0;
-    virtual size_t Tell() = 0;
+    virtual std::vector<char> ReadFile(const std::filesystem::path &filePath) = 0;
+    virtual void WriteFile(const std::filesystem::path &filePath, const std::vector<char> &content) = 0;
+    virtual bool FileExists(const std::filesystem::path &filePath) = 0;
 };
 
-class Provider
+class NativeFileProvider : public Provider
 {
 public:
-    [[nodiscard]] virtual bool Exists(const std::filesystem::path &relativePath) = 0;
-    [[nodiscard]] virtual Ethyl::Shared<File> OpenRead(const std::filesystem::path &relativePath) = 0;
-    [[nodiscard]] virtual Ethyl::Shared<File> OpenWrite(const std::filesystem::path &relativePath) = 0;
+    NativeFileProvider(const std::filesystem::path &folderPath);
+    std::vector<char> ReadFile(const std::filesystem::path &filePath) override;
+    void WriteFile(const std::filesystem::path &filePath, const std::vector<char> &content) override;
+    bool FileExists(const std::filesystem::path &filePath) override;
+private:
+    std::filesystem::path m_Directory;
+    std::vector<std::string> m_IndexedFiles;
 };
 }
 

@@ -11,16 +11,6 @@ namespace Potion::Core
         return *m_Context;
     }
 
-    Services &Engine::Services()
-    {
-        return CurrentContext().m_Services;
-    }
-
-    EventBus &Engine::EventBus()
-    {
-        return CurrentContext().m_EventBus;
-    }
-
     void Engine::Initialize()
     {
         ETHYL_ASSERT(!m_Context, "Engine is already initialized!");

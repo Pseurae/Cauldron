@@ -3,6 +3,7 @@
 
 #include <string_view>
 #include <source_location>
+#include <array>
 
 namespace Ethyl::Traits
 {
