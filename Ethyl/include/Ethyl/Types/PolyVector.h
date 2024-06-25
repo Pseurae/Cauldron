@@ -2,6 +2,7 @@
 #define ETHYL_TYPES_POLYVECTOR_H
 
 #include "Ethyl/Assert.h"
+#include "Ethyl/Traits/Constructible.h"
 #include "Ethyl/Traits/Name.h"
 
 namespace Ethyl::Types
@@ -21,7 +22,7 @@ public:
     PolyVector& operator=(PolyVector&&) = default;
 
     template<typename T, typename... Args>
-    requires(std::derived_from<T, Base> && std::same_as<T, Base> == EnableSameType)
+    requires(std::derived_from<T, Base> && std::same_as<T, Base> == EnableSameType && Traits::Constructible<T, Args...>)
     inline T& Create(Args&&... args)
     {
         const auto index = m_Indexer.Get<T>();

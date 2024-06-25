@@ -2,6 +2,8 @@
 #define ETHYL_TYPES_TYPEVECTOR_H
 
 #include "Ethyl/Assert.h"
+#include "Ethyl/Traits/Arguments.h"
+#include "Ethyl/Traits/Constructible.h"
 #include "Ethyl/Types/TypeIndexer.h"
 #include "Ethyl/Traits/Name.h"
 #include <any>
@@ -20,16 +22,15 @@ public:
     TypeVector& operator=(TypeVector&&) = default;
 
     template<typename T, typename... Args>
+    requires(Traits::Constructible<T, Args...>)
     inline T& Create(Args&&... args)
     {
         const auto index = m_Indexer.Get<T>();
         if (index >= m_Values.size()) m_Values.resize(index + 1);
         ETHYL_ASSERT(!m_Values[index].has_value(), "An instance of {} already exists!", Ethyl::Traits::Name<T>::value);
 
-        if constexpr (std::is_aggregate_v<T>)
-            m_Values[index] = T{std::forward<Args>(args)...};
-        else
-            m_Values[index] = T(std::forward<Args>(args)...);
+        if constexpr (std::is_aggregate_v<T>) m_Values[index] = T{std::forward<Args>(args)...};
+        else m_Values[index] = T(std::forward<Args>(args)...);
 
         return std::any_cast<T&>(m_Values[index]);
     }

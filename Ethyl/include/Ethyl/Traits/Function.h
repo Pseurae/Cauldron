@@ -9,6 +9,7 @@ template<typename Fn>
 struct Function : Function<decltype(&Fn::operator())>
 {
     static constexpr bool IsFunctor = true;
+    static constexpr bool IsMemberFunction = false;
 };
 
 template<typename Ret, typename... Args>

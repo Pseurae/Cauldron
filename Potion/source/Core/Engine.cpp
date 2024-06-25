@@ -36,7 +36,7 @@ namespace Potion::Core
             {
             case EState::Init: [[unlikely]]
                 SignalEvents(SignalHelper<Event::PreInit, Event::Init, Event::PostInit>{});
-                ctx.m_State = EState::Running;
+                if (ctx.m_State == EState::Init) ctx.m_State = EState::Running;
                 break;
             case EState::Running: [[likely]]
                 SignalEvents(SignalHelper<Event::PreUpdate, Event::Update, Event::PostUpdate>{});

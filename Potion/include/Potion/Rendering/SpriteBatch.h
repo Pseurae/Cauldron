@@ -8,16 +8,16 @@
 
 namespace Potion::Rendering
 {
-enum SpriteBatchSort
-{
-    Immediate
-};
-
 class SpriteBatch final
 {
 public:
+    enum class BatchSorting
+    {
+        Immediate
+    };
+
     SpriteBatch(Tonic::Graphics::Device &device, int maxBatches);
-    void Begin(Camera &);
+    void Begin(Camera &, BatchSorting);
     void End();
 
     struct SpriteBatchItem

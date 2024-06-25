@@ -1,4 +1,4 @@
-set(TEST_SOURCES eventhandler.cpp)
+set(TEST_SOURCES eventhandler.cpp services.cpp)
 
 foreach (SOURCE ${TEST_SOURCES})
 add_executable(${SOURCE} ${SOURCE})

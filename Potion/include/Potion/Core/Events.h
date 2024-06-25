@@ -4,11 +4,10 @@
 #include <Ethyl/Traits/Function.h>
 #include <Ethyl/Types/TypeIndexer.h>
 #include <Ethyl/Pointers.h>
+#include <Ethyl/Traits/Constructible.h>
+#include <Ethyl/Assert.h>
 #include <unordered_map>
 #include <functional>
-#include <stdio.h>
-#include <string>
-#include <string.h>
 #include <type_traits>
 
 namespace Potion::Core
@@ -25,7 +24,7 @@ private:
 
         if constexpr (FuncTraits::IsMemberFunction)
         {
-            // ETHYL_ASSERT(instance, "Instance is a nullptr!");
+            ETHYL_ASSERT(instance, "Instance is a nullptr!");
             if constexpr (TakeNoArgs) (static_cast<typename FuncTraits::Class *>(instance)->*Fn)();
             else (static_cast<typename FuncTraits::Class *>(instance)->*Fn)(*static_cast<Event *>(event));
         }
@@ -89,32 +88,15 @@ public:
     }
 
     template<typename Event, typename... Args>
+    requires(Ethyl::Traits::Constructible<Event, Args...>)
     inline void Post([[maybe_unused]] Args&&... args)
     {
-        if constexpr(std::is_empty_v<Event>) {
-            union { Event event; };
-            Post(event);
-        } 
-        else if constexpr(requires { Event(std::forward<Args>(args)...); }) 
-        {
-            Event event(std::forward<Args>(args)...);
-            Post(event);
-        } 
-        else if constexpr(requires { Event{std::forward<Args>(args)...}; }) 
-        {
-            Event event{std::forward<Args>(args)...};
-            Post(event);
-        } 
-        else 
-        {
-            []<bool T = false>() {
-                static_assert(T, "Event type not constructible from args");
-            }();
-        }
+        if constexpr (std::is_aggregate_v<Event>) Post(Event{std::forward<Args>(args)...});
+        else Post(Event(std::forward<Args>(args)...));
     }
 
     template<typename Event>
-    inline void Post(Event &event)
+    inline void Post(Event &&event)
     {
         auto range = m_Handlers.equal_range(Ethyl::Traits::UniqueID<Event>::value);
 
@@ -134,6 +116,15 @@ public:
     inline void Remove(void *instance)
     {
         RemoveHandler<Event, Fn>(instance);
+    }
+
+    template<typename... Events>
+    inline void RemoveAll()
+    {
+        if constexpr (Ethyl::Traits::Arguments<Events...>::Arity == 1)
+            m_Handlers.erase(Ethyl::Traits::UniqueID<Events...>::value);
+        else
+            (RemoveEvent<Events>(), ...);
     }
 
     inline void ClearAll()
