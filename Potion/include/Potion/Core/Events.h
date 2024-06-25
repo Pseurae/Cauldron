@@ -25,7 +25,7 @@ private:
 
         if constexpr (FuncTraits::IsMemberFunction)
         {
-            ETHYL_ASSERT(instance, "Instance is a nullptr!");
+            // ETHYL_ASSERT(instance, "Instance is a nullptr!");
             if constexpr (TakeNoArgs) (static_cast<typename FuncTraits::Class *>(instance)->*Fn)();
             else (static_cast<typename FuncTraits::Class *>(instance)->*Fn)(*static_cast<Event *>(event));
         }
@@ -68,7 +68,7 @@ public:
     }
 
     template<auto Fn, typename FuncTraits = Ethyl::Traits::Function<decltype(Fn)>, typename = std::enable_if_t<FuncTraits::Arity == 1>, typename Event = typename FuncTraits::SanitizedTypes::template NthType<0>>
-    requires(CanBeCallback<Event, decltype(Fn)>)
+    requires(CanBeCallback<Event, decltype(Fn), true>)
     inline void Register(FuncTraits::Class *instance)
     {
         AddHandler<Event, Fn>(instance);
