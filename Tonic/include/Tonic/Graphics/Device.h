@@ -40,19 +40,19 @@ public:
     /* Vertices */
 
     template<typename T, std::size_t N>
-    [[nodiscard]] inline Ethyl::Shared<Buffer> CreateBuffer(std::span<const T, N> data, BufferRole role)
+    [[nodiscard]] inline Ethyl::Shared<Buffer> CreateBufferFromSpan(std::span<const T, N> data, BufferRole role)
     {
         return CreateBuffer(std::span<const unsigned char>{ (const unsigned char *)data.data(), data.size_bytes() }, role);
     }
 
     template<typename T, std::size_t N>
-    [[nodiscard]] inline Ethyl::Shared<Buffer> CreateBuffer(const T (&arr)[N], BufferRole role)
+    [[nodiscard]] inline Ethyl::Shared<Buffer> CreateBufferFromArray(const T (&arr)[N], BufferRole role)
     {
         return CreateBuffer(std::span<const unsigned char>{ (const unsigned char *)arr, N * sizeof(T) }, role);
     }
 
     template<typename T>
-    [[nodiscard]] inline Ethyl::Shared<Buffer> CreateBuffer(const T &arr, BufferRole role)
+    [[nodiscard]] inline Ethyl::Shared<Buffer> CreateBufferFromType(const T &arr, BufferRole role)
     {
         return CreateBuffer(std::span<const unsigned char>{ (const unsigned char *)&arr, sizeof(T) }, role);
     }

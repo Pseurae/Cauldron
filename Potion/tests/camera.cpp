@@ -14,17 +14,13 @@
 
 #include <Tonic/FileSystem/VFS/Drive.h>
 
+#include <Potion/Rendering/Camera.h>
+
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
-
-static const float VertexBufferData[] = {
-    -0.5f, -0.5f, 0.0, 0.0,
-    -0.5f,  0.5f, 0.0, 1.0,
-     0.5f, -0.5f, 1.0, 0.0,
-     0.5f,  0.5f, 1.0, 1.0,
-};
 
 using namespace Tonic::Graphics;
 
@@ -33,11 +29,16 @@ static const std::string vertexShaderSource = R"(
 layout (location = 0) in vec2 aPos;
 layout (location = 1) in vec2 aUv;
 
+layout (std140) uniform Uniforms {
+    vec4 uColor;
+    mat4 uViewProjectionMatrix;
+};
+
 out vec2 vUV;
 
 void main()
 {
-    gl_Position = vec4(aPos.x, aPos.y, 0.0f, 1.0f);
+    gl_Position = uViewProjectionMatrix * vec4(aPos, 0.0f, 1.0f);
     vUV = aUv;
 }
 )";
@@ -49,6 +50,7 @@ in vec2 vUV;
 
 layout (std140) uniform Uniforms {
     vec4 uColor;
+    mat4 uViewProjectionMatrix;
 };
 
 uniform sampler2D tex0;
@@ -59,6 +61,27 @@ void main()
 } 
 )";
 
+// static const float VertexBufferData[] = {
+//     -0.5f, -0.5f, 0.0, 0.0,
+//     -0.5f,  0.5f, 0.0, 1.0,
+//      0.5f, -0.5f, 1.0, 0.0,
+//      0.5f,  0.5f, 1.0, 1.0,
+// };
+
+static const float VertexBufferData[] = {
+    0.0f, 0.0f, 0.0, 0.0,
+    0.0f, 600.0f, 0.0, 1.0,
+    800.0f, 0.0f, 1.0, 0.0,
+    800.0f, 600.0f, 1.0, 1.0,
+};
+
+static const glm::vec2 VertexBufferData1[] = {
+    glm::vec2(0.0f, 0.0f),
+    glm::vec2(0.0f, 600.0f),
+    glm::vec2(800.0f, 0.0f),
+    glm::vec2(800.0f, 600.0f),
+};
+
 static const unsigned int indices[] = {
     0, 1, 2,
     2, 1, 3
@@ -67,6 +90,7 @@ static const unsigned int indices[] = {
 struct Uniforms
 {
     glm::vec4 color;
+    glm::mat4 ViewProjectionMatrix;
 };
 
 #include <iostream>
@@ -75,19 +99,9 @@ int main(int argc, char* const argv[])
 {
     bool isRunning = true;
 
-    Tonic::Input::Keyboard keyboard;
-    Tonic::Input::Mouse mouse;
-
     Tonic::Graphics::Window window;
 
     window.SetCloseCallback([&]() { isRunning = false; });
-    window.SetKeyCallback([&](Tonic::Input::Key key, Tonic::Input::Action action, Tonic::Input::KeyMod mods) {
-        keyboard.Update(key, action, mods);
-    });
-    window.SetMouseButtonCallback([&](Tonic::Input::MouseButton button, Tonic::Input::Action action, Tonic::Input::KeyMod mods) {
-        mouse.Update(button, action, mods);
-    });
-
     window.Create({ "Test", 800, 600 });
 
     Ethyl::Unique<Tonic::Graphics::Device> device = Ethyl::CreateUnique<Tonic::Graphics::OpenGL::OGLDevice>(window);
@@ -100,15 +114,20 @@ int main(int argc, char* const argv[])
     };
     auto textureDesc = TextureDesc{ textureData, 2, 2, 4, TextureWrapMode::ClampBorder, TextureFilterType::Nearest };
 
-    const Uniforms uboData = { glm::vec4(1.0f, 0.0f, 0.0f, 1.0f) };
+    Potion::Rendering::Camera camera(0, 0, 800, 600);
+    camera.SetPosition(100, 100);
+    // camera.SetRotation(45.0f);
+
+    Uniforms uboData = { glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), camera.GetViewProjectionMatrix() };
 
     auto vbo = device->CreateBufferFromArray(VertexBufferData, BufferRole::Vertex);
     auto ibo = device->CreateBufferFromArray(indices, BufferRole::Index);
-    auto ubo = device->CreateBufferFromType(uboData, BufferRole::Uniform);
+    auto ubo = device->CreateBuffer(sizeof(Uniforms), BufferRole::Uniform);
+    // ubo->SetSubData({ (unsigned char *)&uboData, sizeof(uboData) }, 0);
 
     auto texture = device->CreateTexture(textureDesc);
     auto shader = device->CreateShader({ vertexShaderSource, fragmentShaderSource, });
-    device->SetViewport({0, 0, 800, 600});
+    // device->SetViewport({0, 0, 800, 600});
 
     Layout vertexLayout = {
         { DataType::Float, 2, 0 },
@@ -120,18 +139,21 @@ int main(int argc, char* const argv[])
     device->SetClearColor({ 1.0, 1.0, 1.0, 1.0 });
     device->Clear();
 
-    device->DrawIndexed({ DrawMode::Triangles, vbo, ibo, sizeof(indices) / sizeof(*indices), 0, IndexElementType::Int });
-    device->Present();
+    // device->DrawIndexed({ DrawMode::Triangles, vbo, ibo, sizeof(indices) / sizeof(*indices), 0, IndexElementType::Int });
+    // device->Present();
 
+    int i = 0;
     while (isRunning)
     {
-        keyboard.SwapState();
-        mouse.SwapState();
-
         window.PumpEvents();
+        device->Clear();
 
-        if (keyboard.Released(Tonic::Input::Key::A)) std::cout << "Pressed A." << std::endl;
-        if (mouse.Pressed(Tonic::Input::MouseButton::Left)) std::cout << "Pressed LMB" << std::endl;
+        camera.SetRotation(float(i++ % 360));
+        uboData.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+        ubo->SetSubData({ (unsigned char *)&uboData, sizeof(uboData) }, 0);
+
+        device->DrawIndexed({ DrawMode::Triangles, vbo, ibo, sizeof(indices) / sizeof(*indices), 0, IndexElementType::Int });
+        device->Present();
     }
 
     return 0;

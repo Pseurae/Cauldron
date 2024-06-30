@@ -5,6 +5,7 @@
 #include <string>
 #include <functional>
 #include "Tonic/Input/Keys.h"
+#include <glm/vec2.hpp>
 
 struct GLFWwindow;
 
@@ -38,6 +39,7 @@ public:
     void SetCloseCallback(CloseCallback callback) { m_CloseCallback = callback; }
 
     GLFWwindow *GetNativeHandle() const { return m_Window; }
+    glm::vec2 GetWindowSize() const { return m_WindowSize; }
 
 private:
     GLFWwindow *m_Window;
@@ -45,6 +47,8 @@ private:
     KeyCallback m_KeyCallback = nullptr;
     MouseButtonCallback m_MouseButtonCallback = nullptr;
     CloseCallback m_CloseCallback = nullptr;
+
+    glm::vec2 m_WindowSize;
 };
 }
 

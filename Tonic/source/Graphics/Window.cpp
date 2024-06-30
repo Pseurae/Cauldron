@@ -57,6 +57,8 @@ bool Window::Create(const WindowDescriptor &desc, bool createGLContext)
     m_Window = glfwCreateWindow(desc.width, desc.height, desc.title.c_str(), nullptr, nullptr);
     if (m_Window == nullptr) return false;
 
+    m_WindowSize = { desc.width, desc.width };
+
     glfwSetWindowUserPointer(m_Window, this);
 
     glfwSetKeyCallback(m_Window, [](GLFWwindow *window, int key, int, int action, int mods) {
