@@ -1,103 +1,43 @@
-#include <Potion/Core/Engine.h>
-#include <Potion/ECS/World.h>
-#include <Potion/ECS/System.h>
-#include <Ethyl/Types/PolyVector.h>
-
 #include <iostream>
+#include <thread>
+#include <Potion/Core/Engine.h>
+#include <chrono>
 
-using namespace Potion::Core;
-using namespace Potion::ECS;
+std::chrono::time_point<std::chrono::system_clock> tp1, tp2;
 
-struct Position 
+void tick(Potion::Core::Event::Tick &t)
 {
-    int x, y;
-};
+    auto now = std::chrono::system_clock::now();
+    std::chrono::duration<double> duration = now - tp1;
+    std::cout << "Tick: " << t.tickRate << " " << duration << std::endl;
+    tp1 = now;
+}
 
-struct Velocity
+void update(Potion::Core::Event::Update &t)
 {
-    int x, y;
-};
-
-struct PhysicsSystem : public System<Position, Velocity>
-{
-    void Invoke(EntityID id, Position& pos, Velocity& vel)
-    {
-        std::cout << "Physics system" << std::endl;
-        std::cout << "Entity ID: " << id << std::endl;
-        std::cout << "Pos: " << pos.x << " " << pos.y << std::endl;
-        std::cout << "Vel: " << vel.x << " " << vel.y << std::endl;
-
-        vel.y = 100;
-    };
-};
-
-struct PositionSystem : public System<Position>
-{
-    void Invoke(EntityID id, Position& pos)
-    {
-        std::cout << "Position system" << std::endl;
-        std::cout << "Entity ID: " << id << std::endl;
-        std::cout << "Pos: " << pos.x << " " << pos.y << std::endl;
-    };
-};
+    auto now = std::chrono::system_clock::now();
+    std::chrono::duration<double> duration = now - tp2;
+    std::cout << "Update: " << t.timeDelta << " " << duration << std::endl;
+    tp2 = now;
+}
 
 int main(int, char *[]) 
-{ 
+{
+    using namespace Potion::Core;
+    using namespace std::chrono_literals;
+
     try 
     {
+        tp1 = std::chrono::system_clock::now();
+        tp2 = tp1;
+
+        auto close = [](){ static int counter = 0; if (counter++ > 5) Engine::Shutdown(); };
+
         Engine::Initialize();
-
-        // std::cout << Engine::Services().Has<TestService1, TestService2, TestService3>() << std::endl;
-
-        World world;
-        auto entity1 = world.CreateEntity();
-
-        world.AssignComponent<Position>(entity1, 10, 20);
-        world.AssignComponent<Velocity>(entity1, 1, 5);
-
-        // auto t = world.System<Position, Velocity>(+[](EntityID id, const Position &pos, Velocity &vel) {
-        //     std::cout << id << std::endl;
-        //     std::cout << pos.x << " " << pos.y << std::endl;
-        //     std::cout << vel.x << " " << vel.y << std::endl;
-        //     vel.y = 100;
-        // });
-
-        // t();
-
-        auto &physicsSystem = world.RegisterSystem<PhysicsSystem>();
-        auto &positionSystem = world.RegisterSystem<PositionSystem>();
-
-        world.RunSystem(physicsSystem);
-        world.RunSystem(positionSystem);
-
-        std::cout << "----" << std::endl;
-
-        auto entity2 = world.CreateEntity();
-
-        world.AssignComponent<Position>(entity2, 15, 20);
-        world.AssignComponent<Velocity>(entity2, 20, 5);
-
-        world.RunSystem(physicsSystem);
-        world.RunSystem(positionSystem);
-
-        // world.DestroyEntity(entity1);
-        world.RemoveComponent<Velocity>(entity1);
-
-        std::cout << "----" << std::endl;
-
-        world.RunSystem(physicsSystem);
-        world.RunSystem(positionSystem);
-
-        std::cout << "----" << std::endl;
-
-        world.AssignComponent<Velocity>(entity1, { 10, 20 });
-
-        world.RunSystem(physicsSystem);
-        world.RunSystem(positionSystem);
-
-        world.RemoveSystem<decltype(physicsSystem)>();
-        world.RemoveSystem<decltype(positionSystem)>();
-
+        Engine::EventBus().Register<Event::Tick, &tick>();
+        Engine::EventBus().Register<Event::Update, &update>();
+        Engine::EventBus().Register<Event::PostTick, close>();
+        Engine::Ignite(30);
         return 0;
     }
     catch (std::runtime_error &e)

@@ -1,4 +1,6 @@
 set(TONIC_SOURCES         
+    "Core/Time.cpp"
+
     "FileSystem/VFS/Drive.cpp"
     "FileSystem/VFS/Provider.cpp"
 

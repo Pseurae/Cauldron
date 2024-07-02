@@ -15,17 +15,17 @@ struct PreInit {};
 struct Init {};
 struct PostInit {};
 
-struct PreUpdate {};
-struct Update {};
-struct PostUpdate {};
+struct PreUpdate { double timeDelta; };
+struct Update : PreUpdate {};
+struct PostUpdate : PreUpdate {};
 
-struct PreTick {};
-struct Tick {};
-struct PostTick{};
+struct PreTick { double tickRate; };
+struct Tick : PreTick {};
+struct PostTick : PreTick {};
 
-struct PreRender {};
-struct Render {};
-struct PostRender {};
+struct PreRender { double timeDelta; };
+struct Render : PreRender {};
+struct PostRender : PreRender {};
 
 struct PreShutdown {};
 struct Shutdown {};
@@ -56,6 +56,16 @@ private:
         EState m_State;
         EventBus m_EventBus;
         Ethyl::Types::TypeVector m_Services;
+
+        double m_TimeStart = 0.0;
+
+        double m_TimeDelta = 0.0;
+
+        double m_TimeLast = 0.0;
+        double m_TimeCurrent = 0.0;
+
+        double m_TickRate = 1.0 / 60.0;
+        double m_TickRemainer = 0.0;
     };
 
     // No need for this to be a unique_ptr
@@ -66,8 +76,11 @@ public:
     inline static EventBus &EventBus() { return CurrentContext().m_EventBus; }
 
     static void Initialize();
-    static void Ignite();
+    static void Ignite(uint64_t numTicks = 60);
     static void Shutdown();
+
+    static double GetStartTime();
+    static double GetRunTime();
 
     template<typename Service, typename... Args>
     inline static void RegisterService(Args&&... args)
