@@ -5,7 +5,7 @@
 
 namespace Potion::ECS
 {
-using EntityID = std::uintmax_t;
+using EntityID = ::std::uintmax_t;
 
 namespace Constants
 {

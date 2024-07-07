@@ -1,14 +1,15 @@
 #ifndef POTION_RENDERING_SPRITEBATCH_H
 #define POTION_RENDERING_SPRITEBATCH_H
 
-#include "Tonic/Graphics/Device.h"
-#include "Tonic/Graphics/Buffer.h"
+#include <Tonic/Graphics/Device.h>
+#include <Tonic/Graphics/Buffer.h>
+#include <Tonic/Graphics/Resource.h>
 
 #include "Potion/Rendering/Camera.h"
 
 namespace Potion::Rendering
 {
-class SpriteBatch final
+class SpriteBatch final : public Tonic::Graphics::Resource
 {
 public:
     enum class BatchSorting
@@ -54,8 +55,6 @@ private:
     std::vector<BatchItem> m_Batches;
 
     Ethyl::Shared<Tonic::Graphics::Texture> m_CurrentTex;
-
-    Tonic::Graphics::Device &m_Device;
 };
 }
 

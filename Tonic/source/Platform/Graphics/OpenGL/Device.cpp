@@ -17,7 +17,7 @@
 
 namespace Tonic::Graphics::OpenGL
 {
-OGLDevice::OGLDevice(const Window &window) : Device(window), m_Window(window)
+OGLDevice::OGLDevice(Window &window) : Device(window)
 {
     if (gl3wInit()) throw std::runtime_error("Could not bind OpenGL functions!");
 
@@ -25,6 +25,7 @@ OGLDevice::OGLDevice(const Window &window) : Device(window), m_Window(window)
     glBindVertexArray(m_VertexArray);
 
     glEnable(GL_BLEND);
+    glEnable(GL_SCISSOR_TEST);
 }
 
 OGLDevice::~OGLDevice()
@@ -64,9 +65,9 @@ void OGLDevice::SetTextures(const std::vector<Ethyl::Shared<Texture>> &textures)
     }
 }
 
-void OGLDevice::SetViewport(const glm::ivec4 &view)
+void OGLDevice::SetViewport(const glm::ivec4 &viewport)
 {
-    glViewport(view.x, view.y, view.z, view.w);
+    glViewport(viewport.x, viewport.y, viewport.z, viewport.w);
 }
 
 static constexpr unsigned int getGLType(DataType type)
@@ -270,6 +271,6 @@ void OGLDevice::Clear()
 
 void OGLDevice::Present()
 {
-    m_Window.SwapBuffers();
+    GetWindow().SwapBuffers();
 }
 }

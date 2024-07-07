@@ -34,7 +34,7 @@ public:
         bool NPOTTexturesSupported:1;
     };
 
-    explicit Device(const Window &window);
+    explicit Device(Window &window);
     virtual ~Device() = default;
 
     /* Vertices */
@@ -70,13 +70,18 @@ public:
     /* FrameBuffer */
 
     /* Render */
-    virtual void SetViewport(const glm::ivec4 &view) = 0;
+    virtual void SetViewport(const glm::ivec4 &viewport) = 0;
     virtual void SetPipeline(const Pipeline &pipeline) = 0;
     virtual void DrawIndexed(const DrawIndexedDesc &desc) = 0;
 
     virtual void SetClearColor(const glm::vec4 &color) = 0;
     virtual void Clear() = 0;
     virtual void Present() = 0;
+
+    Window &GetWindow() { return m_Window; }
+
+private:
+    Window &m_Window;
 };
 }
 

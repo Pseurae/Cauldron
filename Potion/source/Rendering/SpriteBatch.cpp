@@ -4,7 +4,7 @@
 
 namespace Potion::Rendering
 {
-SpriteBatch::SpriteBatch(Tonic::Graphics::Device &device, int maxBatches) : m_Device(device), m_MaxBatches(maxBatches)
+SpriteBatch::SpriteBatch(Tonic::Graphics::Device &device, int maxBatches) : Resource(device), m_MaxBatches(maxBatches)
 {
     int *indices = new int[maxBatches * 6];
     m_Indices = device.CreateBuffer({ (unsigned char *)indices, sizeof(int) * maxBatches * 6 }, Tonic::Graphics::BufferRole::Index);

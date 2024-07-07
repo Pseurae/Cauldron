@@ -28,7 +28,7 @@ namespace Potion::Core
 
         const auto SignalEvents = []<typename... Events>(SignalHelper<Events...> a, auto&&... args)
         {
-            (EventBus().Post<Events>(args...), ...);
+            (EventBus().Post<Events>(std::forward<decltype(args)>(args)...), ...);
         };
 
         bool isRunning = true;

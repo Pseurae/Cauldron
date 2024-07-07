@@ -75,13 +75,6 @@ static const float VertexBufferData[] = {
     800.0f, 600.0f, 1.0, 1.0,
 };
 
-static const glm::vec2 VertexBufferData1[] = {
-    glm::vec2(0.0f, 0.0f),
-    glm::vec2(0.0f, 600.0f),
-    glm::vec2(800.0f, 0.0f),
-    glm::vec2(800.0f, 600.0f),
-};
-
 static const unsigned int indices[] = {
     0, 1, 2,
     2, 1, 3
@@ -99,9 +92,18 @@ int main(int argc, char* const argv[])
 {
     bool isRunning = true;
 
+    Tonic::Input::Keyboard keyboard;
+    Tonic::Input::Mouse mouse;
     Tonic::Graphics::Window window;
 
     window.SetCloseCallback([&]() { isRunning = false; });
+
+    window.SetKeyCallback([&](Tonic::Input::Key key, Tonic::Input::Action action, Tonic::Input::KeyMod mods) {
+        keyboard.Update(key, action, mods);
+    });
+    window.SetMouseButtonCallback([&](Tonic::Input::MouseButton button, Tonic::Input::Action action, Tonic::Input::KeyMod mods) {
+        mouse.Update(button, action, mods);
+    });
     window.Create({ "Test", 800, 600 });
 
     Ethyl::Unique<Tonic::Graphics::Device> device = Ethyl::CreateUnique<Tonic::Graphics::OpenGL::OGLDevice>(window);
@@ -114,9 +116,8 @@ int main(int argc, char* const argv[])
     };
     auto textureDesc = TextureDesc{ textureData, 2, 2, 4, TextureWrapMode::ClampBorder, TextureFilterType::Nearest };
 
-    Potion::Rendering::Camera camera(0, 0, 800, 600);
-    camera.SetPosition(100, 100);
-    // camera.SetRotation(45.0f);
+    Potion::Rendering::Camera camera(*device, 800, 600);
+    int x = 0, y = 0;
 
     Uniforms uboData = { glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), camera.GetViewProjectionMatrix() };
 
@@ -127,7 +128,6 @@ int main(int argc, char* const argv[])
 
     auto texture = device->CreateTexture(textureDesc);
     auto shader = device->CreateShader({ vertexShaderSource, fragmentShaderSource, });
-    // device->SetViewport({0, 0, 800, 600});
 
     Layout vertexLayout = {
         { DataType::Float, 2, 0 },
@@ -148,7 +148,25 @@ int main(int argc, char* const argv[])
         window.PumpEvents();
         device->Clear();
 
-        camera.SetRotation(float(i++ % 360));
+        if (keyboard.Pressed(Tonic::Input::Key::Left) || keyboard.Held(Tonic::Input::Key::Left))
+        {
+            x -= 5;
+        }
+        else if (keyboard.Pressed(Tonic::Input::Key::Right) || keyboard.Held(Tonic::Input::Key::Right))
+        {
+            x += 5;
+        }
+
+        if (keyboard.Pressed(Tonic::Input::Key::Up) || keyboard.Held(Tonic::Input::Key::Up))
+        {
+            y -= 5;
+        }
+        else if (keyboard.Pressed(Tonic::Input::Key::Down) || keyboard.Held(Tonic::Input::Key::Down))
+        {
+            y += 5;
+        }
+
+        camera.SetPosition(x, y);
         uboData.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
         ubo->SetSubData({ (unsigned char *)&uboData, sizeof(uboData) }, 0);
 

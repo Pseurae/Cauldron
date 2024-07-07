@@ -9,7 +9,7 @@ namespace Tonic::Graphics::OpenGL
 class OGLDevice final : public Device
 {
 public:
-    OGLDevice(const Window &window);
+    OGLDevice(Window &window);
     ~OGLDevice();
 
     /* Vertices */
@@ -24,7 +24,7 @@ public:
     void SetTextures(const std::vector<Ethyl::Shared<Texture>> &textures) override;
 
     /* Render */
-    void SetViewport(const glm::ivec4 &view) override;
+    void SetViewport(const glm::ivec4 &viewport) override;
     void SetPipeline(const Pipeline &pipeline) override;
     void DrawIndexed(const DrawIndexedDesc &desc) override;
 
@@ -34,9 +34,7 @@ public:
 
 private:
     unsigned int m_VertexArray;
-
     Layout m_Layout;
-    const Window &m_Window;
 };
 }
 
