@@ -34,14 +34,14 @@ static int getFilterType(TextureFilterType type)
     ETHYL_BREAK("Invalid TextureFilterType given.");
 }
 
-OGLTexture::OGLTexture(Device &device, const TextureDesc &desc) : Texture(device)
+OGLTexture::OGLTexture(OGLDevice &device, const TextureDesc &desc) : Texture(device), m_Size{desc.width, desc.height}
 {
     glGenTextures(1, &m_TextureID);
     glBindTexture(GL_TEXTURE_2D, m_TextureID);
 
     unsigned int format = desc.numChannels == 3 ? GL_RGB : GL_RGBA; 
 
-    if (desc.data != nullptr && desc.numChannels != 0)
+    if (desc.numChannels != 0)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, format, desc.width, desc.height, 0, format, GL_UNSIGNED_BYTE, desc.data);
         glGenerateMipmap(GL_TEXTURE_2D);

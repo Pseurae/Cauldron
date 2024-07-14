@@ -13,6 +13,7 @@ set(TONIC_SOURCES
 
     "Platform/Graphics/OpenGL/Buffer.cpp"
     "Platform/Graphics/OpenGL/Device.cpp"
+    "Platform/Graphics/OpenGL/FrameBuffer.cpp"
     "Platform/Graphics/OpenGL/Shader.cpp"
     "Platform/Graphics/OpenGL/Texture.cpp"
 )

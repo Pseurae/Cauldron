@@ -25,8 +25,8 @@ struct TextureDesc
     unsigned int width, height;
     unsigned numChannels;
 
-    TextureWrapMode wrapMode;
-    TextureFilterType filterType;
+    TextureWrapMode wrapMode = TextureWrapMode::ClampBorder;
+    TextureFilterType filterType = TextureFilterType::Nearest;
 };
 
 class Texture : public Resource

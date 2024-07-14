@@ -1,9 +1,27 @@
 #include "Tonic/Platform/Graphics/OpenGL/Shader.h"
 #include <GL/gl3w.h>
+#include <Ethyl/Assert.h>
 
 namespace Tonic::Graphics::OpenGL
 {
-OGLShader::OGLShader(Device &device, const ShaderDesc &desc) : Shader(device)
+static void CheckShaderCompileErrors(unsigned int shader, bool isVertex)
+{
+    int hasError;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &hasError);
+
+    if (hasError == GL_FALSE)
+    {
+        int maxLength = 0;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+        std::vector<char> infoLog(maxLength);
+        glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
+        glDeleteShader(shader);
+
+        ETHYL_BREAK("{} shader compilation failed: {}", isVertex ? "Vertex" : "Fragment", std::string_view(infoLog.data()));
+    }
+}
+
+OGLShader::OGLShader(OGLDevice &device, const ShaderDesc &desc) : Shader(device)
 {
     unsigned int vertex = 0, fragment = 0;
     const char *source = NULL;
@@ -13,10 +31,14 @@ OGLShader::OGLShader(Device &device, const ShaderDesc &desc) : Shader(device)
     glShaderSource(vertex, 1, &source, NULL);
     glCompileShader(vertex);
 
+    CheckShaderCompileErrors(vertex, true);
+
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     source = desc.fragment.c_str();
     glShaderSource(fragment, 1, &source, NULL);
     glCompileShader(fragment);
+
+    CheckShaderCompileErrors(fragment, false);
 
     m_ProgramID = glCreateProgram();
     glAttachShader(m_ProgramID, vertex);

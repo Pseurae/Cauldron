@@ -20,7 +20,7 @@ static unsigned int GLTarget(BufferRole role)
     ETHYL_BREAK("Invalid BufferRole given.");
 }
 
-OGLBuffer::OGLBuffer(Device &device, std::span<const unsigned char> data, BufferRole bufferRole) : Buffer(device, bufferRole)
+OGLBuffer::OGLBuffer(OGLDevice &device, std::span<const unsigned char> data, BufferRole bufferRole) : Buffer(device, bufferRole)
 {
     auto target = GLTarget(bufferRole);
 
@@ -31,7 +31,7 @@ OGLBuffer::OGLBuffer(Device &device, std::span<const unsigned char> data, Buffer
     glBindBuffer(target, 0);
 }
 
-OGLBuffer::OGLBuffer(Device &device, unsigned int size, BufferRole bufferRole) : Buffer(device, bufferRole)
+OGLBuffer::OGLBuffer(OGLDevice &device, unsigned int size, BufferRole bufferRole) : Buffer(device, bufferRole)
 {
     auto target = GLTarget(bufferRole);
 

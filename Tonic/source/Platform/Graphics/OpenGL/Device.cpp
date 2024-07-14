@@ -2,6 +2,7 @@
 #include "Tonic/Platform/Graphics/OpenGL/Buffer.h"
 #include "Tonic/Platform/Graphics/OpenGL/Shader.h"
 #include "Tonic/Platform/Graphics/OpenGL/Texture.h"
+#include "Tonic/Platform/Graphics/OpenGL/FrameBuffer.h"
 
 #include "Tonic/Graphics/Draw.h"
 #include "Tonic/Graphics/Blend.h"
@@ -13,7 +14,6 @@
 #include <GL/gl3w.h>
 
 #include <numeric>
-#include <stdexcept>
 
 namespace Tonic::Graphics::OpenGL
 {
@@ -65,9 +65,29 @@ void OGLDevice::SetTextures(const std::vector<Ethyl::Shared<Texture>> &textures)
     }
 }
 
+Ethyl::Shared<FrameBuffer> OGLDevice::CreateFrameBuffer(const FrameBufferDesc &desc)
+{
+    return Ethyl::CreateShared<OGLFrameBuffer>(*this, desc);
+}
+
 void OGLDevice::SetViewport(const glm::ivec4 &viewport)
 {
     glViewport(viewport.x, viewport.y, viewport.z, viewport.w);
+}
+
+void OGLDevice::SetRenderTarget(const Ethyl::Shared<FrameBuffer> &fb)
+{
+    if (fb == nullptr)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        SetViewport({0, 0, GetWindow().GetWindowSize()});
+    }
+    else
+    {
+        auto oglFB = std::static_pointer_cast<OGLFrameBuffer>(fb);
+        glBindFramebuffer(GL_FRAMEBUFFER, oglFB->GetID());
+        SetViewport({0, 0, oglFB->GetViewportSize()});
+    }
 }
 
 static constexpr unsigned int getGLType(DataType type)

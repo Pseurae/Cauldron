@@ -21,6 +21,9 @@ class Texture;
 struct ShaderDesc;
 class Shader;
 
+struct FrameBufferDesc;
+class FrameBuffer;
+
 struct Pipeline;
 
 struct DrawIndexedDesc;
@@ -52,7 +55,7 @@ public:
     }
 
     template<typename T>
-    [[nodiscard]] inline Ethyl::Shared<Buffer> CreateBufferFromType(const T &arr, BufferRole role)
+    [[nodiscard]] inline Ethyl::Shared<Buffer> CreateBufferFromStruct(const T &arr, BufferRole role)
     {
         return CreateBuffer(std::span<const unsigned char>{ (const unsigned char *)&arr, sizeof(T) }, role);
     }
@@ -68,8 +71,10 @@ public:
     virtual void SetTextures(const std::vector<Ethyl::Shared<Texture>> &textures) = 0;
 
     /* FrameBuffer */
+    [[nodiscard]] virtual Ethyl::Shared<FrameBuffer> CreateFrameBuffer(const FrameBufferDesc &desc) = 0;
 
     /* Render */
+    virtual void SetRenderTarget(const Ethyl::Shared<FrameBuffer> &fb) = 0;
     virtual void SetViewport(const glm::ivec4 &viewport) = 0;
     virtual void SetPipeline(const Pipeline &pipeline) = 0;
     virtual void DrawIndexed(const DrawIndexedDesc &desc) = 0;

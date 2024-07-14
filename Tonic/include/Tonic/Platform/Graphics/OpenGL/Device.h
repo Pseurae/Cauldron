@@ -23,7 +23,11 @@ public:
     Ethyl::Shared<Texture> CreateTexture(const TextureDesc &desc) override;
     void SetTextures(const std::vector<Ethyl::Shared<Texture>> &textures) override;
 
+    /* FrameBuffers */
+    Ethyl::Shared<FrameBuffer> CreateFrameBuffer(const FrameBufferDesc &desc) override;
+
     /* Render */
+    void SetRenderTarget(const Ethyl::Shared<FrameBuffer> &fb) override;
     void SetViewport(const glm::ivec4 &viewport) override;
     void SetPipeline(const Pipeline &pipeline) override;
     void DrawIndexed(const DrawIndexedDesc &desc) override;

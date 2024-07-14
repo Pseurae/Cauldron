@@ -104,7 +104,7 @@ int main(int argc, char* const argv[])
 
     auto vbo = device->CreateBufferFromArray(VertexBufferData, BufferRole::Vertex);
     auto ibo = device->CreateBufferFromArray(indices, BufferRole::Index);
-    auto ubo = device->CreateBufferFromType(uboData, BufferRole::Uniform);
+    auto ubo = device->CreateBufferFromStruct(uboData, BufferRole::Uniform);
 
     auto texture = device->CreateTexture(textureDesc);
     auto shader = device->CreateShader({ vertexShaderSource, fragmentShaderSource, });

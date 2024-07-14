@@ -31,10 +31,10 @@ private:
 int main(int argc, char *argv[])
 {
     Core::Engine::Initialize();
-    Core::Engine::EventBus().Register<&test_func>();
+    Core::Engine::EventBus().Register<test1, &test_func>();
 
     TestClass t;
-    Core::Engine::EventBus().Register<&TestClass::TestCustom>(&t);
+    Core::Engine::EventBus().Register<test1, &TestClass::TestCustom>(&t);
 
     Core::Engine::EventBus().Post<test1>();
     Core::Engine::EventBus().Post<test1>(10);

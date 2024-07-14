@@ -12,7 +12,6 @@
 
 namespace Potion::Core
 {
-// Should EventManager return a token to identity registered callbacks?
 class EventBus final 
 {
 private:
@@ -59,6 +58,7 @@ public:
     EventBus& operator=(EventBus&&) = default;
     EventBus& operator=(const EventBus&) = default;
 
+/*
     template<auto Fn, typename FuncTraits = Ethyl::Traits::Function<decltype(Fn)>, typename = std::enable_if_t<FuncTraits::Arity == 1>, typename Event = typename FuncTraits::SanitizedTypes::template NthType<0>>
     requires(CanBeCallback<Event, decltype(Fn)>)
     inline void Register()
@@ -72,6 +72,7 @@ public:
     {
         AddHandler<Event, Fn>(instance);
     }
+*/
 
     template<typename Event, auto Fn>
     requires(CanBeCallback<Event, decltype(Fn)>)
