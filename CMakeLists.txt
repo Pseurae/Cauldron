@@ -13,6 +13,3 @@ set(CMAKE_CXX_FLAGS "-O3")
 add_subdirectory(Ethyl)
 add_subdirectory(Tonic)
 add_subdirectory(Potion)
-
-add_executable(Test test.cpp)
-target_link_libraries(Test PUBLIC Potion)
