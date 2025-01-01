@@ -2,6 +2,7 @@
 #define TONIC_GRAPHICS_TEXTURE_H
 
 #include "Tonic/Graphics/Resource.h"
+#include <glm/vec2.hpp>
 
 namespace Tonic::Graphics
 {
@@ -32,8 +33,14 @@ struct TextureDesc
 class Texture : public Resource
 {
 public:
-    explicit Texture(Device &device) : Resource(device) {}
+    Texture(Device &device, const TextureDesc &desc);
+    ~Texture();
+
+    const auto GetID() const { return m_TextureID; }
+    const auto GetSize() const { return m_Size; }
 private:
+    glm::ivec2 m_Size;
+    unsigned int m_TextureID;
 };
 }
 

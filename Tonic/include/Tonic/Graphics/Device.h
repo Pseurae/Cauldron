@@ -2,6 +2,7 @@
 #define TONIC_GRAPHICS_DEVICE_H
 
 #include <Ethyl/Pointers.h>
+#include "Tonic/Graphics/Layout.h"
 
 #include <vector>
 #include <span>
@@ -38,7 +39,7 @@ public:
     };
 
     explicit Device(Window &window);
-    virtual ~Device() = default;
+    ~Device();
 
     /* Vertices */
 
@@ -60,33 +61,35 @@ public:
         return CreateBuffer(std::span<const unsigned char>{ (const unsigned char *)&arr, sizeof(T) }, role);
     }
 
-    [[nodiscard]] virtual Ethyl::Shared<Buffer> CreateBuffer(std::span<const unsigned char> data, BufferRole role) = 0; // Static
-    [[nodiscard]] virtual Ethyl::Shared<Buffer> CreateBuffer(unsigned int size, BufferRole role) = 0; // Dynamic
+    [[nodiscard]] Ethyl::Shared<Buffer> CreateBuffer(std::span<const unsigned char> data, BufferRole role); // Static
+    [[nodiscard]] Ethyl::Shared<Buffer> CreateBuffer(unsigned int size, BufferRole role); // Dynamic
 
     /* Shaders */
-    [[nodiscard]] virtual Ethyl::Shared<Shader> CreateShader(const ShaderDesc &desc) = 0;
+    [[nodiscard]] Ethyl::Shared<Shader> CreateShader(const ShaderDesc &desc);
 
     /* Texture */
-    [[nodiscard]] virtual Ethyl::Shared<Texture> CreateTexture(const TextureDesc &desc) = 0;
-    virtual void SetTextures(const std::vector<Ethyl::Shared<Texture>> &textures) = 0;
+    [[nodiscard]] Ethyl::Shared<Texture> CreateTexture(const TextureDesc &desc);
+    void SetTextures(const std::vector<Ethyl::Shared<Texture>> &textures);
 
     /* FrameBuffer */
-    [[nodiscard]] virtual Ethyl::Shared<FrameBuffer> CreateFrameBuffer(const FrameBufferDesc &desc) = 0;
+    [[nodiscard]] Ethyl::Shared<FrameBuffer> CreateFrameBuffer(const FrameBufferDesc &desc);
 
     /* Render */
-    virtual void SetRenderTarget(const Ethyl::Shared<FrameBuffer> &fb) = 0;
-    virtual void SetViewport(const glm::ivec4 &viewport) = 0;
-    virtual void SetPipeline(const Pipeline &pipeline) = 0;
-    virtual void DrawIndexed(const DrawIndexedDesc &desc) = 0;
+    void SetRenderTarget(const Ethyl::Shared<FrameBuffer> &fb);
+    void SetViewport(const glm::ivec4 &viewport);
+    void SetPipeline(const Pipeline &pipeline);
+    void DrawIndexed(const DrawIndexedDesc &desc);
 
-    virtual void SetClearColor(const glm::vec4 &color) = 0;
-    virtual void Clear() = 0;
-    virtual void Present() = 0;
+    void SetClearColor(const glm::vec4 &color);
+    void Clear();
+    void Present();
 
     Window &GetWindow() { return m_Window; }
 
 private:
     Window &m_Window;
+    unsigned int m_VertexArray;
+    Layout m_Layout;
 };
 }
 

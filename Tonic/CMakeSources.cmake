@@ -5,17 +5,15 @@ set(TONIC_SOURCES
     "FileSystem/VFS/Provider.cpp"
 
     "Graphics/Blend.cpp"
+    "Graphics/Buffer.cpp"
     "Graphics/Device.cpp"
+    "Graphics/FrameBuffer.cpp"
+    "Graphics/Shader.cpp"
+    "Graphics/Texture.cpp"
     "Graphics/Window.cpp"
 
     "Input/Keyboard.cpp"
     "Input/Mouse.cpp"
-
-    "Platform/Graphics/OpenGL/Buffer.cpp"
-    "Platform/Graphics/OpenGL/Device.cpp"
-    "Platform/Graphics/OpenGL/FrameBuffer.cpp"
-    "Platform/Graphics/OpenGL/Shader.cpp"
-    "Platform/Graphics/OpenGL/Texture.cpp"
 )
 
 set(TONIC_HEADERS
@@ -32,9 +30,4 @@ set(TONIC_HEADERS
     "Tonic/Input/Keyboard.h"
     "Tonic/Input/Keys.h"
     "Tonic/Input/Mouse.h"
-
-    "Tonic/Platform/Graphics/OpenGL/Buffer.h"
-    "Tonic/Platform/Graphics/OpenGL/Device.h"
-    "Tonic/Platform/Graphics/OpenGL/Shader.h"
-    "Tonic/Platform/Graphics/OpenGL/Texture.h"
 )

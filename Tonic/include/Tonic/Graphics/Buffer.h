@@ -16,14 +16,19 @@ enum class BufferRole
 class Buffer : public Resource 
 {
 public:
-    Buffer(Device &device, BufferRole bufferRole) : Resource(device), m_BufferRole(bufferRole) {}
+    Buffer(Device &device, std::span<const unsigned char> data, BufferRole bufferRole);
+    Buffer(Device &device, unsigned int size, BufferRole bufferRole);
+    ~Buffer();
 
-    virtual void SetData(std::span<const unsigned char> data) = 0;
-    virtual void SetSubData(std::span<const unsigned char> data, unsigned int offset) = 0;
+    void SetData(std::span<const unsigned char> data);
+    void SetSubData(std::span<const unsigned char> data, unsigned int offset);
 
     inline BufferRole GetRole() const { return m_BufferRole; }
+    inline unsigned int GetID() const { return m_ID; }
 private:
     BufferRole m_BufferRole;
+    unsigned int m_ID;
+
 };
 }
 

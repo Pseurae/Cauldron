@@ -9,7 +9,7 @@
 #include <Tonic/Graphics/Pipeline.h>
 #include <Tonic/Graphics/Texture.h>
 #include <Tonic/Graphics/FrameBuffer.h>
-#include <Tonic/Platform/Graphics/OpenGL/Device.h>
+#include <Tonic/Graphics/Device.h>
 
 #include <Ethyl/Pointers.h>
 
@@ -103,7 +103,7 @@ int main(int argc, char* const argv[])
         window.SetCloseCallback([&]() { isRunning = false; });
         window.Create({ "Test", 800, 600 });
 
-        Ethyl::Unique<Tonic::Graphics::Device> device = Ethyl::CreateUnique<Tonic::Graphics::OpenGL::OGLDevice>(window);
+        Tonic::Graphics::Device device(window);
 
         const unsigned char textureData[] = { 
             255, 255, 255, 255, 
@@ -115,41 +115,43 @@ int main(int argc, char* const argv[])
 
         const Uniforms uboData = { glm::vec4(1.0f, 0.0f, 0.0f, 1.0f) };
 
-        auto vbo = device->CreateBufferFromArray(VertexBufferData, BufferRole::Vertex);
-        auto vbo1 = device->CreateBufferFromArray(VertexBufferData1, BufferRole::Vertex);
-        auto ibo = device->CreateBufferFromArray(indices, BufferRole::Index);
+        auto vbo = device.CreateBufferFromArray(VertexBufferData, BufferRole::Vertex);
+        auto vbo1 = device.CreateBufferFromArray(VertexBufferData1, BufferRole::Vertex);
+        auto ibo = device.CreateBufferFromArray(indices, BufferRole::Index);
 
-        auto offscreenTexture = device->CreateTexture({ nullptr, 800, 600, 4 });
+        auto offscreenTexture = device.CreateTexture({ nullptr, 800, 600, 4 });
 
-        auto fb = device->CreateFrameBuffer({ offscreenTexture, nullptr });
+        auto fb = device.CreateFrameBuffer({ offscreenTexture, nullptr });
 
-        auto texture = device->CreateTexture(textureDesc);
-        auto shader = device->CreateShader({ vertexShaderSource, fragmentShaderSource });
-        auto shader1 = device->CreateShader({ vertexShaderSource, fragmentShaderSource1 });
-        device->SetViewport({0, 0, 800, 600});
+        auto texture = device.CreateTexture(textureDesc);
+        auto shader = device.CreateShader({ vertexShaderSource, fragmentShaderSource });
+        auto shader1 = device.CreateShader({ vertexShaderSource, fragmentShaderSource1 });
+        device.SetViewport({0, 0, 800, 600});
 
         Layout vertexLayout = {
             { DataType::Float, 2, 0 },
             { DataType::Float, 2, 0 },
         };
 
-        device->SetRenderTarget(fb);
+        device.SetRenderTarget(fb);
 
-        device->SetClearColor({ 0.0, 0.0, 0.0, 0.0 });
-        device->Clear();
-        device->SetTextures({ texture });
-        device->SetPipeline({ shader1, vertexLayout });
-        device->DrawIndexed({ DrawMode::Triangles, vbo1, ibo, sizeof(indices) / sizeof(*indices), 0, IndexElementType::Int });
+        device.SetViewport({0, 0, 800, 600});
 
-        device->SetRenderTarget(nullptr);
+        device.SetClearColor({ 0.0, 0.0, 0.0, 0.0 });
+        device.Clear();
+        device.SetTextures({ texture });
+        device.SetPipeline({ shader1, vertexLayout });
+        device.DrawIndexed({ DrawMode::Triangles, vbo1, ibo, sizeof(indices) / sizeof(*indices), 0, IndexElementType::Int });
 
-        device->SetClearColor({ 0.5, 0.5, 0.5, 1.0 });
-        device->Clear();
-        device->SetTextures({ offscreenTexture });
-        device->SetPipeline({ shader, vertexLayout });
-        device->DrawIndexed({ DrawMode::Triangles, vbo, ibo, sizeof(indices) / sizeof(*indices), 0, IndexElementType::Int });
+        device.SetRenderTarget(nullptr);
 
-        device->Present();
+        device.SetClearColor({ 0.5, 0.5, 0.5, 1.0 });
+        device.Clear();
+        device.SetTextures({ offscreenTexture });
+        device.SetPipeline({ shader, vertexLayout });
+        device.DrawIndexed({ DrawMode::Triangles, vbo, ibo, sizeof(indices) / sizeof(*indices), 0, IndexElementType::Int });
+
+        device.Present();
 
         while (isRunning)
         {

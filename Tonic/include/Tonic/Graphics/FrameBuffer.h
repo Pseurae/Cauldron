@@ -3,7 +3,7 @@
 
 #include "Tonic/Graphics/Resource.h"
 #include <Ethyl/Pointers.h>
-#include <glm/vec4.hpp>
+#include <glm/vec2.hpp>
 
 namespace Tonic::Graphics
 {
@@ -14,10 +14,17 @@ struct FrameBufferDesc
     Ethyl::Shared<Texture> color, depth;
 };
 
-class FrameBuffer : public Resource
+class FrameBuffer final : public Resource
 {
 public:
-    FrameBuffer(Device &device) : Resource(device) {}
+    FrameBuffer(Device &, const FrameBufferDesc &);
+    ~FrameBuffer();
+
+    auto GetID() const { return m_ID; }
+    const glm::ivec2 GetViewportSize() const;
+private:
+    unsigned int m_ID;
+    Ethyl::Shared<Texture> m_ColorAttachment, m_DepthAttachment;
 };
 }
 

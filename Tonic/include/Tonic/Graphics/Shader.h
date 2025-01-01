@@ -15,10 +15,15 @@ struct ShaderDesc
     std::string fragment;
 };
 
-class Shader : public Resource 
+class Shader : public Resource
 {
 public:
-    explicit Shader(Device &device) : Resource(device) {}
+    Shader(Device &device, const ShaderDesc &desc);
+    ~Shader();
+
+    auto GetID() const { return m_ProgramID; }
+private:
+    unsigned int m_ProgramID;
 };
 }
 
