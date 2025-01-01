@@ -1,4 +1,4 @@
-#include "Tonic/Graphics/Window.h"
+#include "Tonic/Window.h"
 #include "Tonic/Graphics/Device.h"
 #include "Tonic/Graphics/Texture.h"
 #include "Tonic/Graphics/Blend.h"

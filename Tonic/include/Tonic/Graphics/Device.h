@@ -9,10 +9,13 @@
 #include <string>
 #include <glm/vec4.hpp>
 
-namespace Tonic::Graphics 
+namespace Tonic
 {
 class Window;
+}
 
+namespace Tonic::Graphics 
+{
 class Buffer;
 enum class BufferRole;
 

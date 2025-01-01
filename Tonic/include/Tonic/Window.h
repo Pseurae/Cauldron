@@ -1,15 +1,15 @@
 #ifndef TONIC_GRAPHICS_WINDOW_H
 #define TONIC_GRAPHICS_WINDOW_H
 
+#include "Tonic/Keys.h"
 
 #include <string>
 #include <functional>
-#include "Tonic/Input/Keys.h"
 #include <glm/vec2.hpp>
 
 struct GLFWwindow;
 
-namespace Tonic::Graphics
+namespace Tonic
 {
 struct WindowDescriptor
 {

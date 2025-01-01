@@ -2,11 +2,9 @@ cmake_minimum_required(VERSION 3.27)
 project(Cauldron)
 set(CMAKE_CXX_STANDARD 20)
 
-if(POLICY CMP0148) 
-    cmake_policy(SET CMP0148 OLD) 
-endif()
+cmake_policy(SET CMP0148 OLD) 
 
-include(cmake/Dependencies.cmake)
+include(CMake/Dependencies.cmake)
 
 set(CMAKE_CXX_FLAGS "-O3")
 

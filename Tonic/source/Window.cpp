@@ -1,11 +1,12 @@
-#include "Tonic/Graphics/Window.h"
+#include "Tonic/Window.h"
 
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 #include <Ethyl/Assert.h>
 
-namespace Tonic::Graphics
+namespace Tonic
 {
+/*
 static Input::Key convertFromGLFWKey(int key)
 {
     return static_cast<Input::Key>(key);
@@ -42,6 +43,7 @@ static Input::KeyMod convertFromGLFWKeyMod(int mods)
         (mods & GLFW_MOD_NUM_LOCK) == GLFW_MOD_NUM_LOCK,
     };
 }
+*/
 
 bool Window::Create(const WindowDescriptor &desc, bool createGLContext)
 {
@@ -61,21 +63,21 @@ bool Window::Create(const WindowDescriptor &desc, bool createGLContext)
 
     glfwSetWindowUserPointer(m_Window, this);
 
-    glfwSetKeyCallback(m_Window, [](GLFWwindow *window, int key, int, int action, int mods) {
-        auto win = static_cast<Window *>(glfwGetWindowUserPointer(window));
-        if (win->m_KeyCallback && action != GLFW_REPEAT) win->m_KeyCallback(convertFromGLFWKey(key), convertFromGLFWAction(action), convertFromGLFWKeyMod(mods));
-    });
+    // glfwSetKeyCallback(m_Window, [](GLFWwindow *window, int key, int, int action, int mods) {
+    //     auto win = static_cast<Window *>(glfwGetWindowUserPointer(window));
+    //     if (win->m_KeyCallback && action != GLFW_REPEAT) win->m_KeyCallback(convertFromGLFWKey(key), convertFromGLFWAction(action), convertFromGLFWKeyMod(mods));
+    // });
 
     glfwSetWindowCloseCallback(m_Window, [](GLFWwindow *window) {
         auto win = static_cast<Window *>(glfwGetWindowUserPointer(window));
         if (win->m_CloseCallback) win->m_CloseCallback();
     });
 
-    glfwSetMouseButtonCallback(m_Window, [](GLFWwindow *window, int button, int action, int mods) {
-        auto win = static_cast<Window *>(glfwGetWindowUserPointer(window));
-        if (win->m_MouseButtonCallback && button >= GLFW_MOUSE_BUTTON_LEFT && button <= GLFW_MOUSE_BUTTON_MIDDLE) 
-            win->m_MouseButtonCallback(convertFromGLFWMouseButton(button), convertFromGLFWAction(action), convertFromGLFWKeyMod(mods));
-    });
+    // glfwSetMouseButtonCallback(m_Window, [](GLFWwindow *window, int button, int action, int mods) {
+    //     auto win = static_cast<Window *>(glfwGetWindowUserPointer(window));
+    //     if (win->m_MouseButtonCallback && button >= GLFW_MOUSE_BUTTON_LEFT && button <= GLFW_MOUSE_BUTTON_MIDDLE) 
+    //         win->m_MouseButtonCallback(convertFromGLFWMouseButton(button), convertFromGLFWAction(action), convertFromGLFWKeyMod(mods));
+    // });
 
     if (createGLContext)
     {

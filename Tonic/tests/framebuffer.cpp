@@ -1,6 +1,4 @@
-#include <Tonic/Graphics/Window.h>
-#include <Tonic/Input/Keyboard.h>
-#include <Tonic/Input/Mouse.h>
+#include <Tonic/Window.h>
 #include <Tonic/Graphics/Buffer.h>
 #include <Tonic/Graphics/Shader.h>
 #include <Ethyl/Pointers.h>
@@ -98,7 +96,7 @@ int main(int argc, char* const argv[])
     try {
         bool isRunning = true;
 
-        Tonic::Graphics::Window window;
+        Tonic::Window window;
 
         window.SetCloseCallback([&]() { isRunning = false; });
         window.Create({ "Test", 800, 600 });
