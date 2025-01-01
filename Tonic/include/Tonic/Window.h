@@ -1,5 +1,5 @@
-#ifndef TONIC_GRAPHICS_WINDOW_H
-#define TONIC_GRAPHICS_WINDOW_H
+#ifndef TONIC_WINDOW_H
+#define TONIC_WINDOW_H
 
 #include "Tonic/Keys.h"
 
@@ -52,4 +52,4 @@ private:
 };
 }
 
-#endif // TONIC_GRAPHICS_WINDOW_H
+#endif // TONIC_WINDOW_H

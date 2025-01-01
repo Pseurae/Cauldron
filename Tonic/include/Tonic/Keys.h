@@ -1,5 +1,5 @@
-#ifndef TONIC_INPUT_KEYS_H
-#define TONIC_INPUT_KEYS_H
+#ifndef TONIC_KEYS_H
+#define TONIC_KEYS_H
 
 namespace Tonic::Input
 {
@@ -158,4 +158,4 @@ enum class MouseButton
 constexpr auto MouseButtonCount = 3;
 }
 
-#endif // TONIC_INPUT_KEYS_H
+#endif // TONIC_KEYS_H

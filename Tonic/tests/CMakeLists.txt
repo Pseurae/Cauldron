@@ -1,4 +1,4 @@
-set(TEST_SOURCES framebuffer.cpp graphics.cpp vfs.cpp)
+set(TEST_SOURCES eventbus.cpp framebuffer.cpp graphics.cpp vfs.cpp)
 
 foreach (SOURCE ${TEST_SOURCES})
 add_executable(${SOURCE} ${SOURCE})
