@@ -13,4 +13,6 @@ list(TRANSFORM POTION_HEADERS PREPEND "include/")
 
 target_sources(${PROJECT_NAME} PUBLIC ${POTION_SOURCES} ${POTION_HEADERS})
 
-add_subdirectory(tests)
+if (CAULDRON_TESTS_ENABLED)
+    add_subdirectory(tests)
+endif()
