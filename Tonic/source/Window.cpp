@@ -86,6 +86,12 @@ bool Window::Create(const WindowDescriptor &desc, bool createGLContext)
     return true;
 }
 
+void Window::Close()
+{
+    glfwDestroyWindow(m_Window);
+    glfwTerminate();
+}
+
 void Window::ShouldClose(bool shouldClose)
 {
     glfwSetWindowShouldClose(m_Window, shouldClose);

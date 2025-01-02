@@ -29,6 +29,7 @@ public:
     ~Window() = default;
 
     bool Create(const WindowDescriptor &desc, bool createGLContext = true);
+    void Close();
     void ShouldClose(bool shouldClose);
 
     void PumpEvents();
