@@ -6,7 +6,7 @@
 #include <Ethyl/Pointers.h>
 #include <Ethyl/Traits/Constructible.h>
 #include <Ethyl/Assert.h>
-#include <unordered_map>
+#include <map>
 #include <functional>
 #include <type_traits>
 
@@ -158,7 +158,7 @@ private:
         }
     }
 
-    std::unordered_multimap<size_t, Entry> m_Handlers;
+    std::multimap<size_t, Entry> m_Handlers;
 };
 };
 

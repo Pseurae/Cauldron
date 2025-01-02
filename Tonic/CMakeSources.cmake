@@ -9,6 +9,7 @@ set(TONIC_SOURCES
     "Graphics/Shader.cpp"
     "Graphics/Texture.cpp"
 
+    "Time.cpp"
     "Window.cpp"
 )
 
@@ -28,5 +29,6 @@ set(TONIC_HEADERS
     "Tonic/Graphics/Texture.h"
 
     "Tonic/Keys.h"
+    "Tonic/Time.h"
     "Tonic/Window.h"
 )
