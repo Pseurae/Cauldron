@@ -1,7 +1,7 @@
 #ifndef TONIC_KEYS_H
 #define TONIC_KEYS_H
 
-namespace Tonic::Input
+namespace Tonic
 {
 enum class Action
 {

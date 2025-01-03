@@ -20,8 +20,8 @@ struct WindowDescriptor
 class Window final
 {
 private:
-    using KeyCallback = std::function<void(Input::Key key, Input::Action action, Input::KeyMod mods)>;
-    using MouseButtonCallback = std::function<void(Input::MouseButton button, Input::Action action, Input::KeyMod mods)>;
+    using KeyCallback = std::function<void(Key key, Action action, KeyMod mods)>;
+    using MouseButtonCallback = std::function<void(MouseButton button, Action action, KeyMod mods)>;
     using CloseCallback = std::function<void()>;
 
 public:

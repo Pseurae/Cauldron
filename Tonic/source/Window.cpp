@@ -6,35 +6,35 @@
 
 namespace Tonic
 {
-static Input::Key convertFromGLFWKey(int key)
+static Key convertFromGLFWKey(int key)
 {
-    return static_cast<Input::Key>(key);
+    return static_cast<Key>(key);
 }
 
-static Input::MouseButton convertFromGLFWMouseButton(int button)
+static MouseButton convertFromGLFWMouseButton(int button)
 {
     switch (button)
     {
     case GLFW_MOUSE_BUTTON_LEFT:
-        return Input::MouseButton::Left;
+        return MouseButton::Left;
     case GLFW_MOUSE_BUTTON_MIDDLE:
-        return Input::MouseButton::Middle;
+        return MouseButton::Middle;
     case GLFW_MOUSE_BUTTON_RIGHT:
-        return Input::MouseButton::Right;
+        return MouseButton::Right;
     }
 
     ETHYL_BREAK("Invalid mousebutton received.");
 }
 
-static Input::Action convertFromGLFWAction(int action)
+static Action convertFromGLFWAction(int action)
 {
-    if (action == GLFW_PRESS) return Input::Action::Press;
-    else return Input::Action::Release;
+    if (action == GLFW_PRESS) return Action::Press;
+    else return Action::Release;
 }
 
-static Input::KeyMod convertFromGLFWKeyMod(int mods)
+static KeyMod convertFromGLFWKeyMod(int mods)
 {
-    return Input::KeyMod{
+    return KeyMod{
         (mods & GLFW_MOD_SHIFT) == GLFW_MOD_SHIFT,
         (mods & GLFW_MOD_ALT) == GLFW_MOD_ALT,
         (mods & GLFW_MOD_CONTROL) == GLFW_MOD_CONTROL,
