@@ -114,7 +114,7 @@ public:
 
     template<typename Event, auto Fn>
     requires(CanBeCallback<Event, decltype(Fn), true>)
-    inline void Remove(void *instance)
+    inline void Remove(Ethyl::Traits::Function<decltype(Fn)>::Class *instance)
     {
         RemoveHandler<Event, Fn>(instance);
     }
@@ -142,7 +142,7 @@ private:
     }
 
     template<typename Event, auto Fn>
-    inline void RemoveHandler(Ethyl::Traits::Function<decltype(Fn)>::Class *instance)
+    inline void RemoveHandler(void *instance)
     {
         for (auto it = m_Handlers.begin(); it != m_Handlers.end();)
         {
