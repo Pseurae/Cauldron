@@ -16,14 +16,14 @@ public:
     {
         auto hash = Traits::UniqueID<T>::value;
 
-        if (const auto it = m_TypeIndices.find(hash); it != m_TypeIndices.end())
+        if (const auto it = mTypeIndices.find(hash); it != mTypeIndices.end())
         {
             return it->second;
         }
         else [[unlikely]]
         {
-            m_TypeHashes.push_back(hash);
-            return m_TypeIndices.emplace(hash, m_TypeHashes.size() - 1).first->second;
+            mTypeHashes.push_back(hash);
+            return mTypeIndices.emplace(hash, mTypeHashes.size() - 1).first->second;
         }
     }
 
@@ -31,24 +31,24 @@ public:
     void Remove()
     {
         auto hash = Traits::UniqueID<T>::value;
-        const auto it = m_TypeIndices.find(hash);
-        if (it == m_TypeIndices.end()) return;
+        const auto it = mTypeIndices.find(hash);
+        if (it == mTypeIndices.end()) return;
 
         auto typeIndex = it->second;
 
-        if (typeIndex < m_TypeHashes.size() - 1)
+        if (typeIndex < mTypeHashes.size() - 1)
         {
-            auto lastHash = m_TypeHashes.back();
-            m_TypeHashes[typeIndex] = lastHash;
-            m_TypeIndices[lastHash] = typeIndex;
+            auto lastHash = mTypeHashes.back();
+            mTypeHashes[typeIndex] = lastHash;
+            mTypeIndices[lastHash] = typeIndex;
         }
 
-        m_TypeHashes.pop_back();
-        m_TypeIndices.erase(it);
+        mTypeHashes.pop_back();
+        mTypeIndices.erase(it);
     }
 private:
-    std::vector<std::size_t> m_TypeHashes;
-    std::unordered_map<std::size_t, std::size_t> m_TypeIndices;
+    std::vector<std::size_t> mTypeHashes;
+    std::unordered_map<std::size_t, std::size_t> mTypeIndices;
 };
 }
 

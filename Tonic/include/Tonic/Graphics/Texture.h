@@ -37,13 +37,13 @@ public:
     Texture(Device &device, const TextureDesc &desc);
     ~Texture();
 
-    const auto GetID() const { return m_TextureID; }
-    const auto GetSize() const { return m_Size; }
-    const bool GetYFlip() const { return m_YFlip; }
+    const auto GetID() const { return mTextureID; }
+    const auto GetSize() const { return mSize; }
+    const bool GetYFlip() const { return mYFlip; }
 private:
-    bool m_YFlip;
-    glm::vec2 m_Size;
-    unsigned int m_TextureID;
+    bool mYFlip;
+    glm::vec2 mSize;
+    unsigned int mTextureID;
 };
 }
 

@@ -35,21 +35,21 @@ public:
     void PumpEvents();
     void SwapBuffers() const;
     
-    void SetKeyCallback(KeyCallback callback) { m_KeyCallback = callback; }
-    void SetMouseButtonCallback(MouseButtonCallback callback) { m_MouseButtonCallback = callback; }
-    void SetCloseCallback(CloseCallback callback) { m_CloseCallback = callback; }
+    void SetKeyCallback(KeyCallback callback) { mKeyCallback = callback; }
+    void SetMouseButtonCallback(MouseButtonCallback callback) { mMouseButtonCallback = callback; }
+    void SetCloseCallback(CloseCallback callback) { mCloseCallback = callback; }
 
-    GLFWwindow *GetNativeHandle() const { return m_Window; }
-    glm::vec2 GetWindowSize() const { return m_WindowSize; }
+    GLFWwindow *GetNativeHandle() const { return mWindow; }
+    glm::vec2 GetWindowSize() const { return mWindowSize; }
 
 private:
-    GLFWwindow *m_Window;
+    GLFWwindow *mWindow;
 
-    KeyCallback m_KeyCallback = nullptr;
-    MouseButtonCallback m_MouseButtonCallback = nullptr;
-    CloseCallback m_CloseCallback = nullptr;
+    KeyCallback mKeyCallback = nullptr;
+    MouseButtonCallback mMouseButtonCallback = nullptr;
+    CloseCallback mCloseCallback = nullptr;
 
-    glm::vec2 m_WindowSize;
+    glm::vec2 mWindowSize;
 };
 }
 

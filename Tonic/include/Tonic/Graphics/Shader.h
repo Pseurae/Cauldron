@@ -21,9 +21,9 @@ public:
     Shader(Device &device, const ShaderDesc &desc);
     ~Shader();
 
-    auto GetID() const { return m_ProgramID; }
+    auto GetID() const { return mProgramID; }
 private:
-    unsigned int m_ProgramID;
+    unsigned int mProgramID;
 };
 }
 

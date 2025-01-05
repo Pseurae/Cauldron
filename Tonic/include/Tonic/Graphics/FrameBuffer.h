@@ -20,11 +20,11 @@ public:
     FrameBuffer(Device &, const FrameBufferDesc &);
     ~FrameBuffer();
 
-    auto GetID() const { return m_ID; }
+    auto GetID() const { return mID; }
     const glm::ivec2 GetViewportSize() const;
 private:
-    unsigned int m_ID;
-    Ethyl::Shared<Texture> m_ColorAttachment, m_DepthAttachment;
+    unsigned int mID;
+    Ethyl::Shared<Texture> mColorAttachment, mDepthAttachment;
 };
 }
 

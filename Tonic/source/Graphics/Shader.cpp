@@ -40,10 +40,10 @@ Shader::Shader(Device &device, const ShaderDesc &desc) : Resource(device)
 
     CheckShaderCompileErrors(fragment, false);
 
-    m_ProgramID = glCreateProgram();
-    glAttachShader(m_ProgramID, vertex);
-    glAttachShader(m_ProgramID, fragment);
-    glLinkProgram(m_ProgramID);
+    mProgramID = glCreateProgram();
+    glAttachShader(mProgramID, vertex);
+    glAttachShader(mProgramID, fragment);
+    glLinkProgram(mProgramID);
 
     glDeleteShader(vertex);
     glDeleteShader(fragment);
@@ -51,7 +51,7 @@ Shader::Shader(Device &device, const ShaderDesc &desc) : Resource(device)
 
 Shader::~Shader()
 {
-    glDeleteProgram(m_ProgramID);
-    m_ProgramID = 0;
+    glDeleteProgram(mProgramID);
+    mProgramID = 0;
 }
 }

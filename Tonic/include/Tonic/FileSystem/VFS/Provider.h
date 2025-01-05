@@ -22,8 +22,8 @@ public:
     void WriteFile(const std::filesystem::path &filePath, const std::vector<char> &content) override;
     bool FileExists(const std::filesystem::path &filePath) override;
 private:
-    std::filesystem::path m_Directory;
-    std::vector<std::string> m_IndexedFiles;
+    std::filesystem::path mDirectory;
+    std::vector<std::string> mIndexedFiles;
 };
 }
 

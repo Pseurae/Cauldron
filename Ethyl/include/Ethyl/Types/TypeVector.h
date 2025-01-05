@@ -25,14 +25,14 @@ public:
     requires(Traits::Constructible<T, Args...>)
     inline T& Create(Args&&... args)
     {
-        const auto index = m_Indexer.Get<T>();
-        if (index >= m_Values.size()) m_Values.resize(index + 1);
+        const auto index = mIndexer.Get<T>();
+        if (index >= mValues.size()) mValues.resize(index + 1);
         ETHYL_ASSERT(!m_Values[index].has_value(), "An instance of {} already exists!", Ethyl::Traits::Name<T>::value);
 
-        if constexpr (std::is_aggregate_v<T>) m_Values[index] = T{std::forward<Args>(args)...};
-        else m_Values[index] = T(std::forward<Args>(args)...);
+        if constexpr (std::is_aggregate_v<T>) mValues[index] = T{std::forward<Args>(args)...};
+        else mValues[index] = T(std::forward<Args>(args)...);
 
-        return std::any_cast<T&>(m_Values[index]);
+        return std::any_cast<T&>(mValues[index]);
     }
 
     template<typename... T>
@@ -40,9 +40,9 @@ public:
     {
         if constexpr (Traits::Arguments<T...>::Arity == 1)
         {
-            const auto index = m_Indexer.Get<T...>();
-            ETHYL_ASSERT(index < m_Values.size(), "An instance of {} does not exist!", Ethyl::Traits::Name<T...>::value);
-            return (std::any_cast<T&>(m_Values[index]), ...);
+            const auto index = mIndexer.Get<T...>();
+            ETHYL_ASSERT(index < mValues.size(), "An instance of {} does not exist!", Ethyl::Traits::Name<T...>::value);
+            return (std::any_cast<T&>(mValues[index]), ...);
         }
         else
         {
@@ -55,8 +55,8 @@ public:
     {
         if constexpr (Traits::Arguments<T...>::Arity == 1)
         {
-            const auto index = m_Indexer.Get<T...>();
-            if (m_Values.size() > index) m_Values[index].reset();
+            const auto index = mIndexer.Get<T...>();
+            if (mValues.size() > index) mValues[index].reset();
         }
         else
         {
@@ -69,8 +69,8 @@ public:
     {
         if constexpr (Traits::Arguments<T...>::Arity == 1)
         {
-            const auto index = m_Indexer.Get<T...>();
-            return m_Values.size() > index && m_Values[index].has_value();
+            const auto index = mIndexer.Get<T...>();
+            return mValues.size() > index && mValues[index].has_value();
         }
         else
         {
@@ -85,8 +85,8 @@ public:
     }
 
 private:
-    std::vector<std::any> m_Values;
-    TypeIndexer m_Indexer;
+    std::vector<std::any> mValues;
+    TypeIndexer mIndexer;
 };
 }
 

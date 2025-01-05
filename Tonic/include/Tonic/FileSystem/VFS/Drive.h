@@ -30,15 +30,15 @@ public:
         else RegisterProviderInternal(mountPoint, Ethyl::Shared<TProvider>(new TProvider(std::forward<Args>(args)...)));
     }
 
-    inline void ClearAllProviders() { m_Providers.clear(); }
+    inline void ClearAllProviders() { mProviders.clear(); }
     bool FileExists(const std::filesystem::path &path);
 
 private:
     void RegisterProviderInternal(const std::filesystem::path &mountPoint, Ethyl::Shared<Provider> provider);
 
     std::filesystem::path ResolvePath(const std::filesystem::path &basePath, const std::filesystem::path &filePath);
-    std::vector<std::filesystem::path> m_SearchPaths;
-    std::unordered_map<std::filesystem::path, Ethyl::Shared<Provider>> m_Providers;
+    std::vector<std::filesystem::path> mSearchPaths;
+    std::unordered_map<std::filesystem::path, Ethyl::Shared<Provider>> mProviders;
 };
 }
 

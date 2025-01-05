@@ -7,18 +7,18 @@
 namespace Tonic::FileSystem::VFS
 {
 NativeFileProvider::
-NativeFileProvider(const std::filesystem::path &path) : m_Directory(path)
+NativeFileProvider(const std::filesystem::path &path) : mDirectory(path)
 {
     ETHYL_ASSERT(std::filesystem::is_directory(path), "Argument was not a path to a directory! (Given \"{}\")", path.string());
     static auto fltr = [](const std::filesystem::directory_entry &dirEntry) { return dirEntry.is_regular_file() && dirEntry.exists(); };
 
     for (const auto &dirEntry : std::filesystem::recursive_directory_iterator{path} | std::views::filter(fltr))
-        m_IndexedFiles.push_back(std::filesystem::relative(dirEntry.path(), path).string());
+        mIndexedFiles.push_back(std::filesystem::relative(dirEntry.path(), path).string());
 }
 
 std::vector<char> NativeFileProvider::ReadFile(const std::filesystem::path &filePath)
 {
-    auto path = m_Directory / filePath;
+    auto path = mDirectory / filePath;
 
     std::ifstream t(path);
     t.seekg(0, std::ios::end);
@@ -36,7 +36,7 @@ std::vector<char> NativeFileProvider::ReadFile(const std::filesystem::path &file
 
 void NativeFileProvider::WriteFile(const std::filesystem::path &filePath, const std::vector<char> &content)
 {
-    auto path = m_Directory / filePath;
+    auto path = mDirectory / filePath;
 
     std::ofstream t(path);
     t.write(content.data(), content.size());
@@ -45,6 +45,6 @@ void NativeFileProvider::WriteFile(const std::filesystem::path &filePath, const 
 
 bool NativeFileProvider::FileExists(const std::filesystem::path &filePath)
 {
-    return std::find(m_IndexedFiles.begin(), m_IndexedFiles.end(), filePath) != m_IndexedFiles.end();
+    return std::find(mIndexedFiles.begin(), mIndexedFiles.end(), filePath) != mIndexedFiles.end();
 }
 }

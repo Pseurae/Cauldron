@@ -13,12 +13,12 @@
 
 namespace Tonic::Graphics
 {
-Device::Device(Window &window) : m_Window(window)
+Device::Device(Window &window) : mWindow(window)
 {
     if (gl3wInit()) throw ::std::runtime_error("Could not bind OpenGL functions!");
 
-    glGenVertexArrays(1, &m_VertexArray);
-    glBindVertexArray(m_VertexArray);
+    glGenVertexArrays(1, &mVertexArray);
+    glBindVertexArray(mVertexArray);
 
     glEnable(GL_BLEND);
     glEnable(GL_SCISSOR_TEST);
@@ -26,7 +26,7 @@ Device::Device(Window &window) : m_Window(window)
 
 Device::~Device()
 {
-    glDeleteVertexArrays(1, &m_VertexArray);
+    glDeleteVertexArrays(1, &mVertexArray);
 }
 
 Ethyl::Shared<Buffer> Device::CreateBuffer(std::span<const unsigned char> data, BufferRole role)
@@ -198,7 +198,7 @@ void Device::SetPipeline(const Pipeline &pipeline)
         glUniform1i(glGetUniformLocation(shader->GetID(), "tex0"), 0);
     }
 
-    m_Layout = pipeline.vertexLayout;
+    mLayout = pipeline.vertexLayout;
 
     glBlendEquationSeparate(
         getGLBlendFunction(pipeline.blendState.ColorFunction), 
@@ -257,12 +257,12 @@ void Device::DrawIndexed(const DrawIndexedDesc &desc)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices->GetID());
 
     {
-        unsigned int size = std::accumulate(m_Layout.begin(), m_Layout.end(), 0u, [](unsigned int last, VertexElement el) { return getGLSize(el.type) * el.count + last; });
+        unsigned int size = std::accumulate(mLayout.begin(), mLayout.end(), 0u, [](unsigned int last, VertexElement el) { return getGLSize(el.type) * el.count + last; });
 
         uintptr_t stride = 0;
-        for (unsigned int i = 0; i < m_Layout.size(); ++i)
+        for (unsigned int i = 0; i < mLayout.size(); ++i)
         {
-            const auto &el = m_Layout[i];
+            const auto &el = mLayout[i];
 
             glEnableVertexAttribArray(i);
             glVertexAttribPointer(i, el.count, getGLType(el.type), el.normalized, size, (const void *)stride);

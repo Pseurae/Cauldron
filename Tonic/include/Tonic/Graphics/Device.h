@@ -87,12 +87,12 @@ public:
     void Clear();
     void Present();
 
-    Window &GetWindow() { return m_Window; }
+    Window &GetWindow() { return mWindow; }
 
 private:
-    Window &m_Window;
-    unsigned int m_VertexArray;
-    Layout m_Layout;
+    Window &mWindow;
+    unsigned int mVertexArray;
+    Layout mLayout;
 };
 }
 

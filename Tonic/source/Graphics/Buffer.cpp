@@ -20,38 +20,38 @@ static unsigned int GLTarget(BufferRole role)
     ETHYL_BREAK("Invalid BufferRole given.");
 }
 
-Buffer::Buffer(Device &device, std::span<const unsigned char> data, BufferRole bufferRole) : Resource(device), m_BufferRole(bufferRole)
+Buffer::Buffer(Device &device, std::span<const unsigned char> data, BufferRole bufferRole) : Resource(device), mBufferRole(bufferRole)
 {
     auto target = GLTarget(bufferRole);
 
-    glGenBuffers(1, &m_ID);
+    glGenBuffers(1, &mID);
 
-    glBindBuffer(target, m_ID);
+    glBindBuffer(target, mID);
     glBufferData(target, data.size(), data.data(), GL_STATIC_DRAW);
     glBindBuffer(target, 0);
 }
 
-Buffer::Buffer(Device &device, unsigned int size, BufferRole bufferRole) : Resource(device), m_BufferRole(bufferRole)
+Buffer::Buffer(Device &device, unsigned int size, BufferRole bufferRole) : Resource(device), mBufferRole(bufferRole)
 {
     auto target = GLTarget(bufferRole);
 
-    glGenBuffers(1, &m_ID);
+    glGenBuffers(1, &mID);
 
-    glBindBuffer(target, m_ID);
+    glBindBuffer(target, mID);
     glBufferData(target, size, nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(target, 0);
 }
 
 Buffer::~Buffer()
 {
-    glDeleteBuffers(1, &m_ID);
+    glDeleteBuffers(1, &mID);
 }
 
 void Buffer::SetData(std::span<const unsigned char> data)
 {
     auto target = GLTarget(GetRole());
 
-    glBindBuffer(target, m_ID);
+    glBindBuffer(target, mID);
     glBufferData(target, data.size(), data.data(), GL_STATIC_DRAW);
     glBindBuffer(target, 0);
 }
@@ -60,7 +60,7 @@ void Buffer::SetSubData(std::span<const unsigned char> data, unsigned int offset
 {
     auto target = GLTarget(GetRole());
 
-    glBindBuffer(target, m_ID);
+    glBindBuffer(target, mID);
     glBufferSubData(target, offset, data.size(), data.data());
     glBindBuffer(target, 0);
 }

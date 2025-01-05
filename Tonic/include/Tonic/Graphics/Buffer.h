@@ -23,12 +23,11 @@ public:
     void SetData(std::span<const unsigned char> data);
     void SetSubData(std::span<const unsigned char> data, unsigned int offset);
 
-    inline BufferRole GetRole() const { return m_BufferRole; }
-    inline unsigned int GetID() const { return m_ID; }
+    inline BufferRole GetRole() const { return mBufferRole; }
+    inline unsigned int GetID() const { return mID; }
 private:
-    BufferRole m_BufferRole;
-    unsigned int m_ID;
-
+    BufferRole mBufferRole;
+    unsigned int mID;
 };
 }
 

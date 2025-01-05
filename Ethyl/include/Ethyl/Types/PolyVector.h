@@ -25,8 +25,8 @@ public:
     requires(std::derived_from<T, Base> && std::same_as<T, Base> == EnableSameType && Traits::Constructible<T, Args...>)
     inline T& Create(Args&&... args)
     {
-        const auto index = m_Indexer.Get<T>();
-        while (index >= m_Values.size()) m_Values.emplace_back(nullptr, nullptr);
+        const auto index = mIndexer.Get<T>();
+        while (index >= mValues.size()) mValues.emplace_back(nullptr, nullptr);
         ETHYL_ASSERT(!m_Values[index], "An instance of {} already exists!", Ethyl::Traits::Name<T>::value);
 
         Base *instance;
@@ -47,8 +47,8 @@ public:
             instance = new T(std::forward<Args>(args)...);
         }
 
-        m_Values[index] = PointerType(instance, +[](const Base *base) { delete static_cast<const T *>(base); });
-        return *static_cast<T *>(m_Values[index].get());
+        mValues[index] = PointerType(instance, +[](const Base *base) { delete static_cast<const T *>(base); });
+        return *static_cast<T *>(mValues[index].get());
     }
 
     template<typename... T>
@@ -57,9 +57,9 @@ public:
     {
         if constexpr (Traits::Arguments<T...>::Arity == 1)
         {
-            const auto index = m_Indexer.Get<T...>();
-            ETHYL_ASSERT(index < m_Values.size(), "An instance of {} does not exist!", Ethyl::Traits::Name<T...>::value);
-            return (*static_cast<T *>(m_Values[index].get()), ...);
+            const auto index = mIndexer.Get<T...>();
+            ETHYL_ASSERT(index < mValues.size(), "An instance of {} does not exist!", Ethyl::Traits::Name<T...>::value);
+            return (*static_cast<T *>(mValues[index].get()), ...);
         }
         else
         {
@@ -73,8 +73,8 @@ public:
     {
         if constexpr (Traits::Arguments<T...>::Arity == 1)
         {
-            const auto index = m_Indexer.Get<T...>();
-            if (m_Values.size() > index) m_Values[index].reset();
+            const auto index = mIndexer.Get<T...>();
+            if (mValues.size() > index) mValues[index].reset();
         }
         else
         {
@@ -88,8 +88,8 @@ public:
     {
         if constexpr (Traits::Arguments<T...>::Arity == 1)
         {
-            const auto index = m_Indexer.Get<T...>();
-            return m_Values.size() > index && m_Values[index];
+            const auto index = mIndexer.Get<T...>();
+            return mValues.size() > index && mValues[index];
         }
         else
         {
@@ -105,8 +105,8 @@ public:
     }
 
 private:
-    std::vector<PointerType> m_Values;
-    TypeIndexer m_Indexer;
+    std::vector<PointerType> mValues;
+    TypeIndexer mIndexer;
 };
 }
 

@@ -99,7 +99,7 @@ public:
     template<typename Event>
     inline void Post(Event &&event)
     {
-        auto range = m_Handlers.equal_range(Ethyl::Traits::UniqueID<Event>::value);
+        auto range = mHandlers.equal_range(Ethyl::Traits::UniqueID<Event>::value);
 
         for (auto it = range.first; it != range.second; ++it)
             it->second.delegate(it->second.instance, static_cast<void *>(&event));
@@ -123,14 +123,14 @@ public:
     inline void RemoveEvents()
     {
         if constexpr (Ethyl::Traits::Arguments<Events...>::Arity == 1)
-            m_Handlers.erase(Ethyl::Traits::UniqueID<Events...>::value);
+            mHandlers.erase(Ethyl::Traits::UniqueID<Events...>::value);
         else
             (RemoveEvent<Events>(), ...);
     }
 
     inline void ClearAll()
     {
-        m_Handlers.clear();
+        mHandlers.clear();
     }
 
 private:
@@ -138,19 +138,19 @@ private:
     inline void AddHandler(void *instance)
     {
         Entry entry = { instance, DelegateCallback<Event, Fn> };
-        m_Handlers.emplace(Ethyl::Traits::UniqueID<Event>::value, entry);
+        mHandlers.emplace(Ethyl::Traits::UniqueID<Event>::value, entry);
     }
 
     template<typename Event, auto Fn>
     inline void RemoveHandler(void *instance)
     {
-        for (auto it = m_Handlers.begin(); it != m_Handlers.end();)
+        for (auto it = mHandlers.begin(); it != mHandlers.end();)
         {
             const auto &entry = it->second;
 
             if (entry.instance == instance && entry.delegate == DelegateCallback<Event, Fn>)
             {
-                it = m_Handlers.erase(it);
+                it = mHandlers.erase(it);
                 break;
             }
             else
@@ -158,7 +158,7 @@ private:
         }
     }
 
-    std::multimap<size_t, Entry> m_Handlers;
+    std::multimap<size_t, Entry> mHandlers;
 };
 };
 

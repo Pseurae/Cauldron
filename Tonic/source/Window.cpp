@@ -54,32 +54,32 @@ bool Window::Create(const WindowDescriptor &desc, bool createGLContext)
     if (createGLContext) glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
     else glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-    m_Window = glfwCreateWindow(desc.width, desc.height, desc.title.c_str(), nullptr, nullptr);
-    if (m_Window == nullptr) return false;
+    mWindow = glfwCreateWindow(desc.width, desc.height, desc.title.c_str(), nullptr, nullptr);
+    if (mWindow == nullptr) return false;
 
-    m_WindowSize = { desc.width, desc.height };
+    mWindowSize = { desc.width, desc.height };
 
-    glfwSetWindowUserPointer(m_Window, this);
+    glfwSetWindowUserPointer(mWindow, this);
 
-    glfwSetKeyCallback(m_Window, [](GLFWwindow *window, int key, int, int action, int mods) {
+    glfwSetKeyCallback(mWindow, [](GLFWwindow *window, int key, int, int action, int mods) {
         auto win = static_cast<Window *>(glfwGetWindowUserPointer(window));
-        if (win->m_KeyCallback && action != GLFW_REPEAT) win->m_KeyCallback(convertFromGLFWKey(key), convertFromGLFWAction(action), convertFromGLFWKeyMod(mods));
+        if (win->mKeyCallback && action != GLFW_REPEAT) win->mKeyCallback(convertFromGLFWKey(key), convertFromGLFWAction(action), convertFromGLFWKeyMod(mods));
     });
 
-    glfwSetWindowCloseCallback(m_Window, [](GLFWwindow *window) {
+    glfwSetWindowCloseCallback(mWindow, [](GLFWwindow *window) {
         auto win = static_cast<Window *>(glfwGetWindowUserPointer(window));
-        if (win->m_CloseCallback) win->m_CloseCallback();
+        if (win->mCloseCallback) win->mCloseCallback();
     });
 
-    glfwSetMouseButtonCallback(m_Window, [](GLFWwindow *window, int button, int action, int mods) {
+    glfwSetMouseButtonCallback(mWindow, [](GLFWwindow *window, int button, int action, int mods) {
         auto win = static_cast<Window *>(glfwGetWindowUserPointer(window));
-        if (win->m_MouseButtonCallback && button >= GLFW_MOUSE_BUTTON_LEFT && button <= GLFW_MOUSE_BUTTON_MIDDLE) 
-            win->m_MouseButtonCallback(convertFromGLFWMouseButton(button), convertFromGLFWAction(action), convertFromGLFWKeyMod(mods));
+        if (win->mMouseButtonCallback && button >= GLFW_MOUSE_BUTTON_LEFT && button <= GLFW_MOUSE_BUTTON_MIDDLE) 
+            win->mMouseButtonCallback(convertFromGLFWMouseButton(button), convertFromGLFWAction(action), convertFromGLFWKeyMod(mods));
     });
 
     if (createGLContext)
     {
-        glfwMakeContextCurrent(m_Window);   
+        glfwMakeContextCurrent(mWindow);   
         glfwSwapInterval(1);
     }
 
@@ -88,13 +88,13 @@ bool Window::Create(const WindowDescriptor &desc, bool createGLContext)
 
 void Window::Close()
 {
-    glfwDestroyWindow(m_Window);
+    glfwDestroyWindow(mWindow);
     glfwTerminate();
 }
 
 void Window::ShouldClose(bool shouldClose)
 {
-    glfwSetWindowShouldClose(m_Window, shouldClose);
+    glfwSetWindowShouldClose(mWindow, shouldClose);
 }
 
 void Window::PumpEvents()
@@ -104,6 +104,6 @@ void Window::PumpEvents()
 
 void Window::SwapBuffers() const
 {
-    glfwSwapBuffers(m_Window);
+    glfwSwapBuffers(mWindow);
 }
 }
