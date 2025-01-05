@@ -34,7 +34,7 @@ static int getFilterType(TextureFilterType type)
     ETHYL_BREAK("Invalid TextureFilterType given.");
 }
 
-Texture::Texture(Device &device, const TextureDesc &desc) : Resource(device), m_Size{desc.width, desc.height}
+Texture::Texture(Device &device, const TextureDesc &desc) : Resource(device), m_Size{desc.width, desc.height}, m_YFlip{desc.yFlip}
 {
     glGenTextures(1, &m_TextureID);
     glBindTexture(GL_TEXTURE_2D, m_TextureID);

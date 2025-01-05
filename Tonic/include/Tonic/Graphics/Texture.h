@@ -28,6 +28,7 @@ struct TextureDesc
 
     TextureWrapMode wrapMode = TextureWrapMode::ClampBorder;
     TextureFilterType filterType = TextureFilterType::Nearest;
+    bool yFlip = false;
 };
 
 class Texture : public Resource
@@ -38,7 +39,9 @@ public:
 
     const auto GetID() const { return m_TextureID; }
     const auto GetSize() const { return m_Size; }
+    const bool GetYFlip() const { return m_YFlip; }
 private:
+    bool m_YFlip;
     glm::vec2 m_Size;
     unsigned int m_TextureID;
 };

@@ -48,12 +48,22 @@ SpriteBatch::SpriteBatch(Device &device) : Resource(device), mIndexCount(0)
     InitResources();
 }
 
-void SpriteBatch::BeginScene(void)
-{}
+void SpriteBatch::BeginScene(const Ethyl::Shared<FrameBuffer> &fb)
+{
+    if (fb == nullptr)
+        mScreenSize = mDevice.GetWindow().GetWindowSize();
+    else
+        mScreenSize = fb->GetViewportSize();
+
+    mDevice.SetRenderTarget(fb);
+    mDevice.Clear();
+}
 
 void SpriteBatch::EndScene(void)
 {
     Flush();
+
+    mDevice.SetRenderTarget(nullptr);
 }
 
 static const glm::vec4 sTransformVectors[4] = {
@@ -65,23 +75,20 @@ static const glm::vec4 sTransformVectors[4] = {
 
 void SpriteBatch::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const glm::vec4 &color)
 {
-    DrawQuad(position, size, mWhiteTexture, color);
+    glm::mat4 transform = glm::ortho(0.0f, 1.0f, 1.0f, 0.0f) *
+        glm::translate(glm::mat4(1.0f), { position / mScreenSize, 0.0f }) *
+        glm::scale(glm::mat4(1.0f), { size / mScreenSize, 1.0f });
+
+    DrawQuad(transform, mWhiteTexture, color, glm::vec4(0.0f));
 }
 
 void SpriteBatch::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ethyl::Shared<Texture> &texture, const glm::vec4 &crop)
 {
-    DrawQuad(position, size, texture, glm::vec4(1.0f), crop);
-}
-
-void SpriteBatch::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ethyl::Shared<Texture> &texture, const glm::vec4 &color, const glm::vec4 &crop)
-{
-    auto screenSize = mDevice.GetWindow().GetWindowSize();
-
     glm::mat4 transform = glm::ortho(0.0f, 1.0f, 1.0f, 0.0f) *
-        glm::translate(glm::mat4(1.0f), { position / screenSize, 0.0f }) *
-        glm::scale(glm::mat4(1.0f), { size / screenSize, 1.0f });
+        glm::translate(glm::mat4(1.0f), { position / mScreenSize, 0.0f }) *
+        glm::scale(glm::mat4(1.0f), { size / mScreenSize, 1.0f });
 
-    DrawQuad(transform, texture, color, crop);
+    DrawQuad(transform, texture, glm::vec4(1.0f), crop);
 }
 
 void SpriteBatch::DrawQuad(const glm::mat4 &transform, const Ethyl::Shared<Texture> &texture, const glm::vec4 &color, const glm::vec4 &crop)
@@ -98,19 +105,39 @@ void SpriteBatch::DrawQuad(const glm::mat4 &transform, const Ethyl::Shared<Textu
 
     glm::vec2 texCoords[4];
 
-    if (crop.x == crop.z || crop.y == crop.w)
+    if (currentTexture->GetYFlip())
     {
-        texCoords[0] = { 0.0f, 0.0f };
-        texCoords[1] = { 1.0f, 0.0f };
-        texCoords[2] = { 1.0f, 1.0f };
-        texCoords[3] = { 0.0f, 1.0f };
+        if (crop.x == crop.z || crop.y == crop.w)
+        {
+            texCoords[0] = { 0.0f, 1.0f };
+            texCoords[1] = { 1.0f, 1.0f };
+            texCoords[2] = { 1.0f, 0.0f };
+            texCoords[3] = { 0.0f, 0.0f };
+        }
+        else
+        {
+            texCoords[0] = glm::vec2{ crop.x, crop.y } / currentTexture->GetSize();
+            texCoords[1] = glm::vec2{ crop.z, crop.y } / currentTexture->GetSize();
+            texCoords[2] = glm::vec2{ crop.z, crop.w } / currentTexture->GetSize();
+            texCoords[3] = glm::vec2{ crop.x, crop.w } / currentTexture->GetSize();
+        }
     }
     else
     {
-        texCoords[0] = glm::vec2{ crop.x, crop.y } / currentTexture->GetSize();
-        texCoords[1] = glm::vec2{ crop.z, crop.y } / currentTexture->GetSize();
-        texCoords[2] = glm::vec2{ crop.z, crop.w } / currentTexture->GetSize();
-        texCoords[3] = glm::vec2{ crop.x, crop.w } / currentTexture->GetSize();
+        if (crop.x == crop.z || crop.y == crop.w)
+        {
+            texCoords[0] = { 0.0f, 0.0f };
+            texCoords[1] = { 1.0f, 0.0f };
+            texCoords[2] = { 1.0f, 1.0f };
+            texCoords[3] = { 0.0f, 1.0f };
+        }
+        else
+        {
+            texCoords[0] = glm::vec2{ crop.x, crop.y } / currentTexture->GetSize();
+            texCoords[1] = glm::vec2{ crop.z, crop.y } / currentTexture->GetSize();
+            texCoords[2] = glm::vec2{ crop.z, crop.w } / currentTexture->GetSize();
+            texCoords[3] = glm::vec2{ crop.x, crop.w } / currentTexture->GetSize();
+        }
     }
 
     for (unsigned i = 0; i < 4; ++i)
