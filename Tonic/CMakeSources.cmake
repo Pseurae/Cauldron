@@ -7,6 +7,7 @@ set(TONIC_SOURCES
     "Graphics/Device.cpp"
     "Graphics/FrameBuffer.cpp"
     "Graphics/Shader.cpp"
+    "Graphics/SpriteBatch.cpp"
     "Graphics/Texture.cpp"
 
     "Time.cpp"

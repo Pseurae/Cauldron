@@ -23,8 +23,8 @@ enum class TextureFilterType
 struct TextureDesc
 {
     const unsigned char *data;
-    unsigned int width, height;
-    unsigned numChannels;
+    int width, height;
+    int numChannels;
 
     TextureWrapMode wrapMode = TextureWrapMode::ClampBorder;
     TextureFilterType filterType = TextureFilterType::Nearest;
@@ -39,7 +39,7 @@ public:
     const auto GetID() const { return m_TextureID; }
     const auto GetSize() const { return m_Size; }
 private:
-    glm::ivec2 m_Size;
+    glm::vec2 m_Size;
     unsigned int m_TextureID;
 };
 }

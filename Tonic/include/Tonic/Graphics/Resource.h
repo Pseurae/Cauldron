@@ -8,9 +8,9 @@ class Device;
 class Resource
 {
 protected:
-    Device &m_Device;
+    Device &mDevice;
 public:
-    explicit Resource(Device &device) : m_Device(device) {}
+    explicit Resource(Device &device) : mDevice(device) {}
 
     Resource(const Resource&) = delete;
     Resource& operator=(const Resource&) = delete;

@@ -80,9 +80,8 @@ void Device::SetRenderTarget(const Ethyl::Shared<FrameBuffer> &fb)
     }
     else
     {
-        auto FB = std::static_pointer_cast<FrameBuffer>(fb);
-        glBindFramebuffer(GL_FRAMEBUFFER, FB->GetID());
-        SetViewport({0, 0, FB->GetViewportSize()});
+        glBindFramebuffer(GL_FRAMEBUFFER, fb->GetID());
+        SetViewport({0, 0, fb->GetViewportSize()});
     }
 }
 
