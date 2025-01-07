@@ -20,7 +20,7 @@ class SpriteBatch : public Resource
 {
 public:
     explicit SpriteBatch(Device &device);
-    void BeginScene(const Ethyl::Shared<FrameBuffer> &fb);
+    void BeginScene(void);
     void EndScene(void);
     void DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ethyl::Shared<Texture> &texture, const glm::vec4 &crop = glm::vec4(0.0f));
     void DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const glm::vec4 &color);
@@ -50,7 +50,6 @@ private:
     Vertex *mVertexDataBase, *mVertexDataPtr;
     Uniforms mUniforms;
     unsigned int mIndexCount;
-    glm::vec2 mScreenSize;
 };
 }
 

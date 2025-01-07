@@ -48,22 +48,13 @@ SpriteBatch::SpriteBatch(Device &device) : Resource(device), mIndexCount(0)
     InitResources();
 }
 
-void SpriteBatch::BeginScene(const Ethyl::Shared<FrameBuffer> &fb)
+void SpriteBatch::BeginScene(void)
 {
-    if (fb == nullptr)
-        mScreenSize = mDevice.GetWindow().GetWindowSize();
-    else
-        mScreenSize = fb->GetViewportSize();
-
-    mDevice.SetRenderTarget(fb);
-    mDevice.Clear();
 }
 
 void SpriteBatch::EndScene(void)
 {
     Flush();
-
-    mDevice.SetRenderTarget(nullptr);
 }
 
 static const glm::vec4 sTransformVectors[4] = {
@@ -76,8 +67,8 @@ static const glm::vec4 sTransformVectors[4] = {
 void SpriteBatch::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const glm::vec4 &color)
 {
     glm::mat4 transform = glm::ortho(0.0f, 1.0f, 1.0f, 0.0f) *
-        glm::translate(glm::mat4(1.0f), { position / mScreenSize, 0.0f }) *
-        glm::scale(glm::mat4(1.0f), { size / mScreenSize, 1.0f });
+        glm::translate(glm::mat4(1.0f), { position / mDevice.GetPhysicalSize(), 0.0f }) *
+        glm::scale(glm::mat4(1.0f), { size / mDevice.GetPhysicalSize(), 1.0f });
 
     DrawQuad(transform, mWhiteTexture, color, glm::vec4(0.0f));
 }
@@ -85,8 +76,8 @@ void SpriteBatch::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, con
 void SpriteBatch::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ethyl::Shared<Texture> &texture, const glm::vec4 &crop)
 {
     glm::mat4 transform = glm::ortho(0.0f, 1.0f, 1.0f, 0.0f) *
-        glm::translate(glm::mat4(1.0f), { position / mScreenSize, 0.0f }) *
-        glm::scale(glm::mat4(1.0f), { size / mScreenSize, 1.0f });
+        glm::translate(glm::mat4(1.0f), { position / mDevice.GetPhysicalSize(), 0.0f }) *
+        glm::scale(glm::mat4(1.0f), { size / mDevice.GetPhysicalSize(), 1.0f });
 
     DrawQuad(transform, texture, glm::vec4(1.0f), crop);
 }

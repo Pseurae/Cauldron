@@ -22,6 +22,7 @@ Device::Device(Window &window) : mWindow(window)
 
     glEnable(GL_BLEND);
     glEnable(GL_SCISSOR_TEST);
+    mPhysicalSize = GetWindow().GetWindowSize();
 }
 
 Device::~Device()
@@ -66,12 +67,13 @@ Ethyl::Shared<FrameBuffer> Device::CreateFrameBuffer(const FrameBufferDesc &desc
     return Ethyl::CreateShared<FrameBuffer>(*this, desc);
 }
 
-void Device::SetViewport(const glm::ivec4 &viewport)
+void Device::SetViewport(const glm::vec4 &viewport)
 {
     glViewport(viewport.x, viewport.y, viewport.z, viewport.w);
+    mPhysicalSize = { viewport.z - viewport.x, viewport.w - viewport.y };
 }
 
-void Device::SetRenderTarget(const Ethyl::Shared<FrameBuffer> &fb)
+void Device::SetRenderTarget(const Ethyl::Shared<FrameBuffer> &fb, bool clear)
 {
     if (fb == nullptr)
     {
@@ -82,6 +84,7 @@ void Device::SetRenderTarget(const Ethyl::Shared<FrameBuffer> &fb)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, fb->GetID());
         SetViewport({0, 0, fb->GetViewportSize()});
+        if (clear) Clear();
     }
 }
 

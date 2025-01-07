@@ -7,6 +7,7 @@
 #include <vector>
 #include <span>
 #include <string>
+#include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
 namespace Tonic
@@ -78,8 +79,8 @@ public:
     [[nodiscard]] Ethyl::Shared<FrameBuffer> CreateFrameBuffer(const FrameBufferDesc &desc);
 
     /* Render */
-    void SetRenderTarget(const Ethyl::Shared<FrameBuffer> &fb);
-    void SetViewport(const glm::ivec4 &viewport);
+    void SetRenderTarget(const Ethyl::Shared<FrameBuffer> &fb, bool clear = false);
+    void SetViewport(const glm::vec4 &viewport);
     void SetPipeline(const Pipeline &pipeline);
     void DrawIndexed(const DrawIndexedDesc &desc);
 
@@ -87,12 +88,14 @@ public:
     void Clear();
     void Present();
 
-    Window &GetWindow() { return mWindow; }
+    [[nodiscard]] Window &GetWindow() { return mWindow; }
+    [[nodiscard]] glm::vec2 GetPhysicalSize() { return mPhysicalSize; }
 
 private:
     Window &mWindow;
     unsigned int mVertexArray;
     Layout mLayout;
+    glm::vec2 mPhysicalSize;
 };
 }
 
