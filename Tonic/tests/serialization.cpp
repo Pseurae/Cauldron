@@ -19,22 +19,21 @@ struct t
 int main(int argc, char *argv[])
 {
     Tonic::Serialization::Setter oarchive;
+    std::vector<int> vectorT = { 1, 2 }, vectorT1;
 
-    t t2;
-    oarchive(1, 2, t2);
+    oarchive(vectorT, t{12});
 
     for (auto &i : oarchive.GetData())
         std::cout << (unsigned int)i << std::endl;
-
+        
+    t t1{10};
     Tonic::Serialization::Getter iarchive(oarchive.GetData());
-    int a, b;
-    t t1;
+    iarchive(vectorT1, t1);
 
-    iarchive(a, b, t1);
+    for (auto &i : vectorT1)
+        std::cout << i << std::endl;
 
-    std::cout << (unsigned int)a << std::endl;
-    std::cout << (unsigned int)b << std::endl;
-    std::cout << (unsigned int)t1.i << std::endl;
+    std::cout << t1.i << std::endl;
 
     return 0;
 }
