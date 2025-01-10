@@ -1,7 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include <type_traits>
+#include <iostream>
 
 namespace Tonic::Serialization
 {
@@ -35,7 +37,7 @@ public:
     template<typename ...T>
     void operator()(T&&... args)
     {
-        (impl::Encoder<T>::Deserialize(args, *this), ...);   
+        (impl::Encoder<std::remove_cvref_t<T>>::Deserialize(args, *this), ...);   
     }
 
     template<typename U>
@@ -52,7 +54,7 @@ public:
     template<typename ...T>
     void operator()(T&&... args)
     {
-        (impl::Encoder<T>::Serialize(args, *this), ...);   
+        (impl::Encoder<std::remove_cvref_t<T>>::Serialize(args, *this), ...);   
     }
 
     const auto &GetData() const { return mData; }
@@ -90,7 +92,7 @@ struct Encoder<T>
 
 // Vectors
 template<typename T>
-struct Encoder<std::vector<T> &>
+struct Encoder<std::vector<T>>
 {
     static void Serialize(const std::vector<T> &t, Setter &s)
     {
@@ -102,7 +104,7 @@ struct Encoder<std::vector<T> &>
     static void Deserialize(std::vector<T> &t, Getter &g)
     {
         size_t vectorSize;
-        Encoder<decltype(t.size())>::Deserialize(vectorSize, g);
+        Encoder<size_t>::Deserialize(vectorSize, g);
         t.resize(vectorSize);
 
         for (int i = 0; i < vectorSize; ++i)
@@ -110,6 +112,34 @@ struct Encoder<std::vector<T> &>
             T elem;
             Encoder<T>::Deserialize(elem, g);
             t.push_back(elem);
+        }
+    }
+};
+
+// Strings
+template<>
+struct Encoder<std::string>
+{
+    static void Serialize(const std::string &t, Setter &s)
+    {
+        Encoder<decltype(t.size())>::Serialize(t.size(), s);
+        for (auto &i : t)
+            Encoder<decltype(i)>::Serialize(i, s);
+    }
+
+    static void Deserialize(std::string &t, Getter &g)
+    {
+        size_t stringSize;
+        Encoder<size_t>::Deserialize(stringSize, g);
+        t.resize(stringSize);
+
+        char *data = t.data();
+
+        for (int i = 0; i < stringSize; ++i)
+        {
+            char x;
+            Encoder<char>::Deserialize(x, g);
+            data[i] = x;
         }
     }
 };
