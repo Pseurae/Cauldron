@@ -11,8 +11,6 @@
 
 #include <Ethyl/Pointers.h>
 
-#include <Tonic/FileSystem/VFS/Drive.h>
-
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 

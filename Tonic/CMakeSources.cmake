@@ -1,6 +1,6 @@
 set(TONIC_SOURCES         
-    "FileSystem/VFS/Drive.cpp"
-    "FileSystem/VFS/Provider.cpp"
+    "FileSystem/Drive.cpp"
+    "FileSystem/Provider.cpp"
 
     "Graphics/Blend.cpp"
     "Graphics/Buffer.cpp"
@@ -10,13 +10,14 @@ set(TONIC_SOURCES
     "Graphics/SpriteBatch.cpp"
     "Graphics/Texture.cpp"
 
+    "Serialization.cpp"
     "Time.cpp"
     "Window.cpp"
 )
 
 set(TONIC_HEADERS
-    "Tonic/FileSystem/VFS/Drive.h"
-    "Tonic/FileSystem/VFS/Provider.h"
+    "Tonic/FileSystem/Drive.h"
+    "Tonic/FileSystem/Provider.h"
 
     "Tonic/Graphics/Blend.h"
     "Tonic/Graphics/Buffer.h"
@@ -29,6 +30,7 @@ set(TONIC_HEADERS
     "Tonic/Graphics/Shader.h"
     "Tonic/Graphics/Texture.h"
 
+    "Tonic/Serialization.h"
     "Tonic/Keys.h"
     "Tonic/Time.h"
     "Tonic/Window.h"

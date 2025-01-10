@@ -1,13 +1,12 @@
 #include <Ethyl/Assert.h>
 #include <ranges>
-#include "Tonic/FileSystem/VFS/Provider.h"
+#include "Tonic/FileSystem/Provider.h"
 #include <fstream>
 #include <iostream>
 
-namespace Tonic::FileSystem::VFS
+namespace Tonic::FileSystem
 {
-NativeFileProvider::
-NativeFileProvider(const std::filesystem::path &path) : mDirectory(path)
+NativeFileProvider::NativeFileProvider(const std::filesystem::path &path) : mDirectory(path)
 {
     ETHYL_ASSERT(std::filesystem::is_directory(path), "Argument was not a path to a directory! (Given \"{}\")", path.string());
     static auto fltr = [](const std::filesystem::directory_entry &dirEntry) { return dirEntry.is_regular_file() && dirEntry.exists(); };
@@ -20,7 +19,7 @@ std::vector<char> NativeFileProvider::ReadFile(const std::filesystem::path &file
 {
     auto path = mDirectory / filePath;
 
-    std::ifstream t(path);
+    std::ifstream t(path, std::ios::binary);
     t.seekg(0, std::ios::end);
     size_t size = t.tellg();
 
@@ -38,7 +37,7 @@ void NativeFileProvider::WriteFile(const std::filesystem::path &filePath, const 
 {
     auto path = mDirectory / filePath;
 
-    std::ofstream t(path);
+    std::ofstream t(path, std::ios::binary);
     t.write(content.data(), content.size());
     t.close();
 }
