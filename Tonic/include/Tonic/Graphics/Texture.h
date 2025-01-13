@@ -31,11 +31,20 @@ struct TextureDesc
     bool yFlip = false;
 };
 
+struct TextureSubDesc
+{
+    const void *data;
+    int xoffset, yoffset; 
+    int width, height;
+};
+
 class Texture : public Resource
 {
 public:
     Texture(Device &device, const TextureDesc &desc);
     ~Texture();
+
+    void SetData(const TextureSubDesc &desc);
 
     const auto GetID() const { return mTextureID; }
     const auto GetSize() const { return mSize; }
@@ -44,6 +53,7 @@ private:
     bool mYFlip;
     glm::vec2 mSize;
     unsigned int mTextureID;
+    unsigned int mFormat;
 };
 }
 

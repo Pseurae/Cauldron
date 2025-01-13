@@ -7,21 +7,6 @@
 
 namespace Tonic::Serialization
 {
-class Getter;
-class Setter;
-
-template <typename T>
-concept HasSerializeFunction = 
-requires(T t) {
-    { t.Serialize(std::declval<Setter &>()) };
-};
-
-template <typename T>
-concept HasDeserializeFunction = 
-requires(T t) {
-    { t.Deserialize(std::declval<Getter &>()) };
-};
-
 namespace impl
 {
 template<typename T>
@@ -68,6 +53,18 @@ private:
 
 namespace impl
 {
+template <typename T>
+concept HasSerializeFunction = 
+requires(T t) {
+    { t.Serialize(std::declval<Setter &>()) };
+};
+
+template <typename T>
+concept HasDeserializeFunction = 
+requires(T t) {
+    { t.Deserialize(std::declval<Getter &>()) };
+};
+
 template<typename T>
 concept Arithmetic = std::is_arithmetic<std::remove_cvref_t<T>>::value;
 

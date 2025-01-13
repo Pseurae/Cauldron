@@ -39,11 +39,11 @@ Texture::Texture(Device &device, const TextureDesc &desc) : Resource(device), mS
     glGenTextures(1, &mTextureID);
     glBindTexture(GL_TEXTURE_2D, mTextureID);
 
-    unsigned int format = desc.numChannels == 3 ? GL_RGB : GL_RGBA; 
+    mFormat = desc.numChannels == 3 ? GL_RGB : GL_RGBA; 
 
     if (desc.numChannels != 0)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, format, desc.width, desc.height, 0, format, GL_UNSIGNED_BYTE, desc.data);
+        glTexImage2D(GL_TEXTURE_2D, 0, mFormat, desc.width, desc.height, 0, mFormat, GL_UNSIGNED_BYTE, desc.data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
 
@@ -59,5 +59,12 @@ Texture::Texture(Device &device, const TextureDesc &desc) : Resource(device), mS
 Texture::~Texture()
 {
     glDeleteTextures(1, &mTextureID);
+}
+
+void Texture::SetData(const TextureSubDesc &desc)
+{
+    glBindTexture(GL_TEXTURE_2D, mTextureID);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, desc.xoffset, desc.yoffset, desc.width, desc.height, mFormat, GL_UNSIGNED_BYTE, desc.data);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 }

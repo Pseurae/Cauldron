@@ -1,6 +1,7 @@
 #ifndef ETHYL_TRAITS_ARGUMENTS_H
 #define ETHYL_TRAITS_ARGUMENTS_H
 
+#include <utility>
 #include "Ethyl/Traits/Sanitize.h"
 
 namespace Ethyl::Traits
